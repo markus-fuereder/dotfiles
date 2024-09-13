@@ -1,0 +1,8 @@
+*
+!.vscode/
+!.vscode/*
+!colleciton/
+!colleciton/*
+!.gitignore
+!pull.sh
+!README.md
