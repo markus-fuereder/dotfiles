@@ -1,8 +1,8 @@
-*
-!.vscode/
-!.vscode/*
-!colleciton/
-!colleciton/*
+/*/
 !.gitignore
-!pull.sh
-!README.md
+!.vscode/
+!colleciton/
+
+.DS_Store
+*.bak
+__pycache__
