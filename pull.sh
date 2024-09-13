@@ -49,20 +49,20 @@ mkdir -p CONFIG_DIR
 
 COLLECTION="collection"
 COLLECTION_PATH="$REPO_DIR"/"$COLLECTION"/*
-for SRC in $COLLECTION_PATH
+for SRC in $COLLECTION_PATH*
 do 
+    echo "$SRC"
     [ -L "${SRC%/}" ] && continue
     [ "$SRC" = "$COLLECTION_PATH" ] && continue
 
-    name=$(basename "$SRC")
-    echo "$SRC $name"
-    DST="$CONFIG_DIR"/"$name"
-    if [ $DEBUG != "YES" ]; then
+    NAME=$(basename "$SRC")
+    echo "$SRC $NAME"
+    DST="$CONFIG_DIR"/"$NAME"
+    if [ $DRY != "YES" ]; then
         echo "ln -s $SRC ~/$TARGET"
-    else
-        # ln -s $SRC ~/$TARGET
-        echo "ln -s $SRC ~/$TARGET"
+        continue
     fi
+    # ln -s $SRC ~/$TARGET
 done
 
 clean_exit 0
