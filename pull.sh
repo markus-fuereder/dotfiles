@@ -1,6 +1,6 @@
 #!/bin/bash
 DRY="NO"
-DRY="YES"
+# DRY="YES"
 
 if [ $DRY == "YES" ]; then
     echo "DRY RUN ..."
@@ -43,7 +43,7 @@ fi
 
 # MOVE TO TMP DIR
 cd $REPO_DIR
-ls -la
+
 CONFIG_DIR=~/.config
 mkdir -p CONFIG_DIR
 
@@ -51,36 +51,17 @@ COLLECTION="collection"
 COLLECTION_PATH="$REPO_DIR"/"$COLLECTION"/*
 for SRC in $COLLECTION_PATH*
 do 
-    echo "$SRC"
     [ -L "${SRC%/}" ] && continue
     [ "$SRC" = "$COLLECTION_PATH" ] && continue
 
     NAME=$(basename "$SRC")
-    echo "$SRC $NAME"
     DST="$CONFIG_DIR"/"$NAME"
-    if [ $DRY != "YES" ]; then
-        echo "ln -s $SRC ~/$TARGET"
+    if [ $DRY == "YES" ]; then
+        echo "ln -s $SRC $DST"
         continue
     fi
-    # ln -s $SRC ~/$TARGET
+    echo -n "[✖] Linking $NAME "
+    rm -rf "$DST" && ln -sf "$SRC" "$DST" && echo -e "\r[✔] Linking $NAME" || echo " "
 done
 
 clean_exit 0
-
-
-
-
-
-
-
-
-
-# for file in "$COLLECTION/**"; do
-
-#     [ -L "${file%/}" ] && continue
-#     echo "$file"
-#     # if [[ -d "$file" ]]; then
-#     #   TARGET=".config/$file"
-#     #   echo "$file - $COLLECTION/$TARGET ~/$TARGET"
-#     # fi
-# done
