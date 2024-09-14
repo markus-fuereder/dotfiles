@@ -50,7 +50,7 @@ mkdir -p CONFIG_DIR
 COLLECTION="collection"
 COLLECTION_PATH="$REPO_DIR"/"$COLLECTION"/*
 for SRC in $COLLECTION_PATH*
-do 
+do
     [ -L "${SRC%/}" ] && continue
     [ "$SRC" = "$COLLECTION_PATH" ] && continue
 
