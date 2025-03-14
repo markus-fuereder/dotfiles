@@ -9,7 +9,7 @@ fi
 CURRENT_DIR=$PWD
 INSTALL_DIR="/etc"
 TMP_INSTALL_DIR="/tmp"
-GITHUB_USER="markus-dot-fuereder"
+GITHUB_USER="markus-fuereder"
 REPO="dotfiles"
 REPO_DIR="$INSTALL_DIR"/"$REPO"
 REPO_TMP_DIR="$TMP_INSTALL_DIR"/"$REPO".tmp
