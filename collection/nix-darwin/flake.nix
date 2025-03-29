@@ -1,37 +1,86 @@
-# nix run nix-darwin --extra-experimental-features "nix-command flakes" -- switch --show-trace --flake ~/.config/nix-darwin#shared
-nix run nix-darwin --extra-experimental-features "nix-command flakes" -- switch --show-trace --flake "$(readlink -f ~/.config/nix-darwin)#shared"
+# nix run nix-darwin --extra-experimental-features "nix-command flakes" -- switch --show-trace --flake "$(readlink -f ~/.config/nix-darwin)#shared"
+# darwin-rebuild switch --show-trace --flake "$(readlink -f ~/.config/nix-darwin)#shared"
+
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-darwin.url = "github:LnL7/nix-darwin";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
-    home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
+    # https://github.com/hraban/mac-app-util
+    # mac-app-util.url = "github:hraban/mac-app-util";
+    mac-app-util.url = "github:markus-fuereder/nix-mac-app-util";
+    # home-manager = {
+    #   url = "github:nix-community/home-manager";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
   };
 
-  outputs = inputs@{ self, nixpkgs, nix-darwin, home-manager }:
+  outputs = inputs@{ self
+    , nixpkgs
+    , nix-darwin
+    # , nix-homebrew
+    , mac-app-util
+  }:
   let
-    configuration = { pkgs, ... }: {
+    configuration = { pkgs, config, ... }: {
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget
-      services.nix-daemon.enable = true;
+
+      nixpkgs.config.allowUnfree = true;
       nix.settings.experimental-features = "nix-command flakes";
       programs.zsh.enable = true;
       system.configurationRevision = self.rev or self.dirtyRev or null;
       system.stateVersion = 5;
       nixpkgs.hostPlatform = "aarch64-darwin";
-      security.pam.enableSudoTouchIdAuth = true;
-
-      users.users.markus.home = "/Users/markus";
-      home-manager.backupFileExtension = "backup";
-      nix.configureBuildUsers = true;
-      nix.useDaemon = true;
 
       environment.systemPackages = [
-        pkgs.vim
+        # Fonts
+        pkgs.fira-code
+        pkgs.meslo-lgs-nf
+
+        # Terminal emulator
+        pkgs.kitty
+
+        # CLI Tools
+        pkgs.neofetch     # Display system information
+        pkgs.vim          # Text editor
+        # pkgs.git          # Version control
+        pkgs.lazygit      # Terminal UI for git
+        pkgs.mkalias      # Create aliases
+        pkgs.eza          # Replacement for `ls`
+        pkgs.bat          # Replacement for `cat`
+        pkgs.zoxide       # Replacement for `cd`
+        pkgs.fzf          # Fuzzy finder
+        pkgs.pay-respects # Correct previous console command like "thefuck"
+
+        # Development Tools
+        pkgs.fnm
+
+        # Apps
+        pkgs.obsidian
+
+        # pkgs.rectangle-pro
       ];
+      # homebrew = {
+      #   # Homebrew needs to be installed on its own!
+      #   enable = true;
+      #   onActivation.cleanup = "zap";
+      #   brews = [
+      #     "imagemagick"
+      #     "mas"
+      #   ];
+      #   casks = [
+      #     "imageoptim"
+      #     "firefox"
+      #     "the-unarchiver"
+      #     # "istat-menus"
+      #     # "amphetamine"
+      #   ];
+      #   masApps = {
+      #     "1Password" = 1333542190;
+      #   };
+      # };
 
       # Docs: https://daiderd.com/nix-darwin/manual/index.html
       system.defaults = {
@@ -58,7 +107,7 @@ nix run nix-darwin --extra-experimental-features "nix-command flakes" -- switch 
           expose-animation-duration = null;
 
           # Whether to group windows by application in Mission Control’s Exposé. The default is true.
-          expose-group-by-app = null;
+          expose-group-apps = null;
 
           # Magnified icon size on hover. The default is 16.
           largesize = 64;
@@ -173,6 +222,10 @@ nix run nix-darwin --extra-experimental-features "nix-command flakes" -- switch 
           # Show the full date. Default is null.
           ShowDate = 2; # 0 = When space allows 1 = Always 2 = Never
         };
+        WindowManager = {
+          # Click wallpaper to reveal desktop Clicking your wallpaper will move all windows out of the way to allow access to your desktop items and widgets. Default is true. false means “Only in Stage Manager” true means “Always”
+          EnableStandardClickToShowDesktop = false;
+        };
         spaces = {
           # Displays have separate Spaces (note a logout is required before this setting will take effect).
           # false = each physical display has a separate space (Mac default)
@@ -202,24 +255,6 @@ nix run nix-darwin --extra-experimental-features "nix-command flakes" -- switch 
         # Whether to remap the Caps Lock key to Escape.
         remapCapsLockToEscape = true;
       };
-      # homebrew = {
-      #   # Homebrew needs to be installed on its own!
-      #   enable = true;
-
-      #   casks = [
-      #     "imageoptim"
-      #   ];
-      #   brews = [
-      #     "imagemagick"
-      #     "ruby@3.3"
-      #     "cocoapods"
-      #     "fastlane"
-      #     "fvm"
-      #     "openjdk@21"
-      #     "openjdk@17"
-      #     "openjdk@11"
-      #   ];
-      # };
     };
   in
   {
@@ -227,7 +262,16 @@ nix run nix-darwin --extra-experimental-features "nix-command flakes" -- switch 
     # $ darwin-rebuild build --flake .#shared
     darwinConfigurations."shared" = nix-darwin.lib.darwinSystem {
       modules = [
+        mac-app-util.darwinCustomModules.default
         configuration
+        # nix-homebrew.darwinModules.nix-homebrew {
+        #   nix-homebrew = {
+        #     enable = true;
+        #     enableRosetta = true;
+        #     user = "markus";
+        #     autoMigrate = true;
+        #   };
+        # }
         # home-manager.darwinModules.home-manager {
         #   home-manager = {
         #     useGlobalPkgs = true;
