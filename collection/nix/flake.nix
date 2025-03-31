@@ -4,32 +4,34 @@
 {
   # INPUTS =========================================================================================
   inputs = {
-    # nixpkgs --------------------------------------------------------------------------------------
+    # Nix Packages ---------------------------------------------------------------------------------
     nixpkgs = {
       url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     };
 
-    # nix-darwin -----------------------------------------------------------------------------------
+    # Nix Darwin -----------------------------------------------------------------------------------
     nix-darwin = {
       url = "github:LnL7/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # home-manager ---------------------------------------------------------------------------------
+    # Home Manager ---------------------------------------------------------------------------------
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # nix-homebrew ---------------------------------------------------------------------------------
+    # Homebrew -------------------------------------------------------------------------------------
     # nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
 
-    # mac-app-util ---------------------------------------------------------------------------------
+    # Mac App Util ---------------------------------------------------------------------------------
     mac-app-util = {
       # https://github.com/hraban/mac-app-util
       # url = "github:hraban/mac-app-util";
       url = "github:markus-fuereder/nix-mac-app-util";
     };
+
+    nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
   };
 
   # OUTPUTS ========================================================================================
@@ -40,6 +42,7 @@
     , home-manager
     # , nix-homebrew
     , mac-app-util
+    , nix-vscode-extensions
   }: let username = "markus"; in
   {
     # Expose the package set, including overlays, for convenience.
@@ -50,14 +53,15 @@
         ./config.nix
         ./darwin.nix
 
-        # home-manager.darwinModules.home-manager {
-        #    home-manager = {
-        #     useGlobalPkgs = true;
-        #     useUserPackages = true;
-        #     extraSpecialArgs.vars.username = username;
-        #     users.${username} = import ./home.nix;
-        #    };
-        # }
+        home-manager.darwinModules.home-manager {
+          home-manager = {
+            useGlobalPkgs = true;
+            useUserPackages = true;
+            extraSpecialArgs.vars.username = username;
+            users.${username} = import ./home.nix;
+          };
+          users.users.${username}.home = "/Users/${username}";
+        }
 
         # nix-homebrew.darwinModules.nix-homebrew {
         #   nix-homebrew = {
@@ -70,5 +74,9 @@
 
       ];
     };
+
+    nixpkgs.overlays = [
+          nix-vscode-extensions.overlays.default
+        ];
   };
 }

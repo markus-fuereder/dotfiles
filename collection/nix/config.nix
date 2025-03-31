@@ -1,14 +1,4 @@
 { pkgs, config, ... }:
-    # let
-    #  pkgs = import (builtins.fetchGit {
-    #      # Descriptive name to make the store path easier to identify
-    #      name = "my-old-revision";
-    #      url = "https://github.com/NixOS/nixpkgs/";
-    #      ref = "refs/heads/nixpkgs-24.05-darwin";
-    #      rev = "cca4f8e59e9479ced4f02f33530be367220d5826";
-    #  }) {};
-    # _1password-gui-override = pkgs._1password-gui;
-    # in
 {
     # SYSTEM =======================================================================================
     # The `system.stateVersion` option is not defined in your
@@ -20,7 +10,14 @@
     system.stateVersion = 6; # Do not change this
 
     # NIX ==========================================================================================
-    nix.settings.experimental-features = "nix-command flakes";
+    nix = {
+        settings.experimental-features = "nix-command flakes";
+        optimise.automatic = true;
+        gc = {
+            automatic = true;
+            options = "--delete-older-than 1w";
+        };
+    };
 
     # NIX PKGS =====================================================================================
     nixpkgs = {
@@ -31,20 +28,23 @@
     # ZSH ==========================================================================================
     programs.zsh = {
         enable = true;
+        enableCompletion = true;
+        enableSyntaxHighlighting = true;
+        enableFzfCompletion = true;
+        enableFzfGit = true;
+        enableFzfHistory = true;
     };
-
-
 
     # PACKAGES =====================================================================================
     environment.systemPackages = with pkgs; [
         # Fonts ------------------------------------------------------------------------------------
-        fira-code
-        meslo-lgs-nf
+        meslo-lgs-nf # ................................................. Nerd Font for Powerlevel10k
+        fira-code # ................................................................ Programming font
 
         # Terminal emulator and shell --------------------------------------------------------------
         kitty
-        zsh-autosuggestions
-        zsh-syntax-highlighting
+        # zsh-autosuggestions
+        # zsh-syntax-highlighting
 
         # CLI Tools --------------------------------------------------------------------------------
         neofetch # ...................................................... Display system information
@@ -64,6 +64,10 @@
 
         # Development Tools ------------------------------------------------------------------------
         fnm # ......................................................... fast Node.js version manager
+        # vscode # ................................................................ Visual Studio Code
+        vscode-with-extensions
+        # vscode # .................................................. Visual Studio Code without extensions
+        # android-studio # ........................................................ Android Studio IDE
 
         # Apps -------------------------------------------------------------------------------------
         # _1password-gui # .......................................................... Password manager
@@ -76,13 +80,17 @@
 
     # ALIASES ======================================================================================
     environment.shellAliases = {
-        rebuild = "darwin-rebuild switch --flake \"$(readlink -f ~/.config/nix)#shared\"";
+        nix-count-garbage = "nix-store --gc --print-dead | wc -l";
+        nix-rebuild = "darwin-rebuild switch --flake \"$(readlink -f ~/.config/nix)#shared\"";
         cat = "bat";
         ls = "lsd";
         ll = "lsd -l";
         la = "lsd -a";
         lla = "lsd -la";
+        l = "lsd -la";
         grep = "rg";
+        nvm = "fnm";
+        lg = "lazygit";
     };
 
     # HOMEBREW =====================================================================================
@@ -105,7 +113,4 @@
     #     "1Password" = 1333542190;
     #   };
     # };
-
-    # Docs: https://daiderd.com/nix-darwin/manual/index.html
-    
 }
