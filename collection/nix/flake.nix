@@ -75,8 +75,8 @@
       ];
     };
 
-    nixpkgs.overlays = [
-          nix-vscode-extensions.overlays.default
-        ];
+    # nixpkgs.overlays = [
+    #       nix-vscode-extensions.overlays.default
+    #     ];
   };
 }

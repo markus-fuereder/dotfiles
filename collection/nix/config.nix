@@ -33,15 +33,25 @@
         enableFzfCompletion = true;
         enableFzfGit = true;
         enableFzfHistory = true;
+        promptInit = ''
+            source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme
+            source /etc/dotfiles/collection/powerlevel10k/p10k.zsh
+
+            # if [[ -r "''${XDG_CACHE_HOME:-''$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh" ]]; then
+            #     source "''${XDG_CACHE_HOME:-''$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh"
+            # fi
+        '';
     };
 
     # PACKAGES =====================================================================================
     environment.systemPackages = with pkgs; [
         # Fonts ------------------------------------------------------------------------------------
         meslo-lgs-nf # ................................................. Nerd Font for Powerlevel10k
-        fira-code # ................................................................ Programming font
+        fira-code # ............................................................... Programming font
 
         # Terminal emulator and shell --------------------------------------------------------------
+        oh-my-zsh # .................................................................. zsh framework
+        zsh-powerlevel10k # ............................................ Powerlevel10k theme for zsh
         kitty
         # zsh-autosuggestions
         # zsh-syntax-highlighting
@@ -64,10 +74,13 @@
 
         # Development Tools ------------------------------------------------------------------------
         fnm # ......................................................... fast Node.js version manager
-        # vscode # ................................................................ Visual Studio Code
+        # vscode # .............................................................. Visual Studio Code
         vscode-with-extensions
-        # vscode # .................................................. Visual Studio Code without extensions
-        # android-studio # ........................................................ Android Studio IDE
+        # vscode # ........................................... Visual Studio Code without extensions
+        # android-studio # ...................................................... Android Studio IDE
+
+        # Languages --------------------------------------------------------------------------------
+        ruby # ........................................................... Ruby programming language
 
         # Apps -------------------------------------------------------------------------------------
         # _1password-gui # .......................................................... Password manager
