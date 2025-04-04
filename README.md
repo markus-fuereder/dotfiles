@@ -9,5 +9,5 @@
 ## remote
 
 ```sh
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/markus-dot-fuereder/dotfiles/main/pull.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/markus-fuereder/dotfiles/main/pull.sh)"
 ```
