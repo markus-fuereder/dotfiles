@@ -1,4 +1,7 @@
 #!/bin/bash
+
+xcode-select --install
+
 DRY="NO"
 # DRY="YES"
 
@@ -63,5 +66,7 @@ do
     echo -n "[✖] Linking $NAME "
     rm -rf "$DST" && ln -sf "$SRC" "$DST" && echo -e "\r[✔] Linking $NAME" || echo " "
 done
+
+nix run nix-darwin --extra-experimental-features "nix-command flakes" -- switch --show-trace --flake "$(readlink -f ~/.config/nix)#shared"
 
 clean_exit 0
