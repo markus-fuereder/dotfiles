@@ -2,6 +2,7 @@
   "cSpell.words": [
     "AMPM",
     "appswitcher",
+    "autocd",
     "autohide",
     "clmv",
     "cmdline",
@@ -12,9 +13,12 @@
     "fira",
     "Flwv",
     "hilite",
+    "histignorealldups",
     "hraban",
+    "hushlogin",
     "icnv",
     "imageoptim",
+    "interactivecomments",
     "istat",
     "largesize",
     "launchanim",
@@ -27,6 +31,7 @@
     "neofetch",
     "nixpkgs",
     "Nlsv",
+    "nocheckjobs",
     "optimise",
     "Pathbar",
     "pkgs",
@@ -34,6 +39,7 @@
     "powerlevel10k",
     "readlink",
     "recents",
+    "setopt",
     "showhidden",
     "stdenv",
     "tadfisher",
@@ -42,6 +48,7 @@
     "unarchiver",
     "wvous",
     "zhaofengli",
-    "zoxide"
+    "zoxide",
+    "zstyle"
   ]
 }
