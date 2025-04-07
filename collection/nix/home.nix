@@ -1,22 +1,29 @@
 { config, pkgs, lib, vars, ... }:
 {
+  # Home Manager =======================================================================================================
   programs.home-manager.enable = true;
-
   home = {
     stateVersion = "24.11";
     username = "${vars.username}";
     homeDirectory = "/Users/${vars.username}";
     packages = with pkgs; [
-
     ];
   };
-  programs.zsh = {
-    enable = true;
-    # autosuggestions.enable = true;
-    # enableCompletion = true;
-    # syntaxHighlighting.enable = true;
-    # enableSyntaxHighlighting = true;
-  };
+
+  # git ==============================================================================================================
+  # programs.git = {
+  #     enable = true;
+  #     userName = "Markus Füreder";
+  #     userEmail = "markus.fuereder@gmail.com";
+  #     ignores = [
+  #         ".DS_Store"
+  #         ".next"
+  #         ".node_modules"
+  #     ];
+  #     extraConfig = {
+  #         init.defaultBranch = "main";
+  #     };
+  # };
 
   programs.vscode = {
     enable = true;
