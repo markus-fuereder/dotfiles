@@ -58,21 +58,6 @@
         '';
     };
 
-    # GIT ==============================================================================================================
-    # programs.git = {
-    #     enable = true;
-    #     userName = "Markus Füreder";
-    #     userEmail = "markus.fuereder@gmail.com";
-    #     ignores = [ 
-    #         ".DS_Store"
-    #         ".next"
-    #         ".node_modules"
-    #     ];
-    #     extraConfig = {
-    #         init.defaultBranch = "main";
-    #     };
-    # };
-
     # PACKAGES =========================================================================================================
     environment.systemPackages = with pkgs; [
         # Fonts --------------------------------------------------------------------------------------------------------
@@ -119,8 +104,31 @@
         obsidian # ................................................................ Note-taking and knowledge management
         firefox # .......................................................................................... Web browser
         google-chrome # .................................................................................... Web browser
-
     ];
+
+    # HOMEBREW =========================================================================================================
+    # brew cleanup && rm -f $ZSH_COMPDUMP
+    homebrew = {
+      enable = true;
+      onActivation = {
+        cleanup = "zap";
+        autoUpdate = true;
+        upgrade = true;
+      };
+      brews = [
+        "fvm" # ................................................................................ Flutter version manager
+      ];
+      casks = [
+        "imageoptim" # ......................................................................... Image optimization tool
+        "istat-menus" # ......................................................................... System monitoring tool
+      ];
+      masApps = {
+        "Bitwarden" = 1352778147; # ................................................................... Password manager
+        "The Unarchiver" = 425424353; # ............................................................... Unarchiving tool
+        "Amphetamine" = 937984704; # .................................................................... Keep Mac awake
+        "Velja" = 1607635845; # .............................................................. Browser routing for macOS
+      };
+    };
 
     # ALIASES ==========================================================================================================
     environment.shellAliases = {
@@ -139,24 +147,4 @@
         config_pull="sh /etc/dotfiles/pull.sh";
     };
 
-    # HOMEBREW =========================================================================================================
-    # homebrew = {
-    #   # Homebrew needs to be installed on its own!
-    #   enable = true;
-    #   onActivation.cleanup = "zap";
-    #   brews = [
-    #     "imagemagick"
-    #     "mas"
-    #   ];
-    #   casks = [
-    #     "imageoptim"
-    #     "firefox"
-    #     "the-unarchiver"
-    #     # "istat-menus"
-    #     # "amphetamine"
-    #   ];
-    #   masApps = {
-    #     "1Password" = 1333542190;
-    #   };
-    # };
 }

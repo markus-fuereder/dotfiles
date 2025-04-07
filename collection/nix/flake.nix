@@ -22,7 +22,19 @@
     };
 
     # Homebrew -------------------------------------------------------------------------------------
-    # nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
+    nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
+    homebrew-core = {
+      url = "github:homebrew/homebrew-core";
+      flake = false;
+    };
+    homebrew-cask = {
+      url = "github:homebrew/homebrew-cask";
+      flake = false;
+    };
+    homebrew-fvm = {
+      url = "github:leoafarias/homebrew-fvm";
+      flake = false;
+    };
 
     # Mac App Util ---------------------------------------------------------------------------------
     mac-app-util = {
@@ -40,7 +52,7 @@
     , nixpkgs
     , nix-darwin
     , home-manager
-    # , nix-homebrew
+    , nix-homebrew, homebrew-core, homebrew-cask, homebrew-fvm
     , mac-app-util
     , nix-vscode-extensions
   }: let username = "markus"; in
@@ -49,10 +61,9 @@
     darwinPackages = self.darwinConfigurations."shared".pkgs;
     darwinConfigurations."shared" = nix-darwin.lib.darwinSystem {
       modules = [
-        mac-app-util.darwinCustomModules.default
         ./config.nix
         ./darwin.nix
-
+        mac-app-util.darwinCustomModules.default
         home-manager.darwinModules.home-manager {
           home-manager = {
             useGlobalPkgs = true;
@@ -62,15 +73,21 @@
           };
           users.users.${username}.home = "/Users/${username}";
         }
+        nix-homebrew.darwinModules.nix-homebrew {
+          nix-homebrew = {
+            enable = true;
+            user = username;
+            enableRosetta = true;
+            taps = {
+              "homebrew/homebrew-core" = homebrew-core;
+              "homebrew/homebrew-cask" = homebrew-cask;
+              "leoafarias/homebrew-fvm" = homebrew-fvm;
+            };
+            mutableTaps = false;
+            autoMigrate = true;
+          };
+        }
 
-        # nix-homebrew.darwinModules.nix-homebrew {
-        #   nix-homebrew = {
-        #     enable = true;
-        #     enableRosetta = true;
-        #     user = "markus";
-        #     autoMigrate = true;
-        #   };
-        # }
 
       ];
     };
