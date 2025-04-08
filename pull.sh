@@ -44,28 +44,7 @@ else
     git -C $REPO_DIR pull || abort "Failed to pull $REPO_URI"
 fi
 
-# MOVE TO TMP DIR
-cd $REPO_DIR
-
-CONFIG_DIR=~/.config
-mkdir -p CONFIG_DIR
-
-COLLECTION="collection"
-COLLECTION_PATH="$REPO_DIR"/"$COLLECTION"/*
-for SRC in $COLLECTION_PATH*
-do
-    [ -L "${SRC%/}" ] && continue
-    [ "$SRC" = "$COLLECTION_PATH" ] && continue
-
-    NAME=$(basename "$SRC")
-    DST="$CONFIG_DIR"/"$NAME"
-    if [ $DRY == "YES" ]; then
-        echo "ln -s $SRC $DST"
-        continue
-    fi
-    echo -n "[✖] Linking $NAME "
-    rm -rf "$DST" && ln -sf "$SRC" "$DST" && echo -e "\r[✔] Linking $NAME" || echo " "
-done
+sh link.sh
 
 nix run nix-darwin --extra-experimental-features "nix-command flakes" -- switch --show-trace --flake "$(readlink -f ~/.config/nix)#shared"
 
