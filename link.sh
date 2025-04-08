@@ -7,6 +7,8 @@ if [ $DRY == "YES" ]; then
     echo "DRY RUN ..."
 fi
 
+sudo mkdir -p -m 775 /usr/local/bin
+
 INSTALL_DIR="/etc"
 
 REPO="dotfiles"
@@ -41,5 +43,7 @@ do
     echo -n "[✖] Linking $NAME "
     rm -rf "$DST" && ln -sf "$SRC" "$DST" && echo -e "\r[✔] Linking $NAME" || echo " "
 done
+
+sudo chmod -R 777 "$REPO_DIR"/"$COLLECTION"/zsh/secrets.zsh
 
 clean_exit 0
