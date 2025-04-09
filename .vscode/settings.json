@@ -44,6 +44,7 @@
     "powerlevel10k",
     "readlink",
     "recents",
+    "sdkmanager",
     "setopt",
     "showhidden",
     "stdenv",
