@@ -2,4 +2,3 @@
 #! No need to rebuild the nix flake, this will be sourced when the shell starts
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-export PATH=/usr/local/bin:$PATH # ........................................................................... Local bin
