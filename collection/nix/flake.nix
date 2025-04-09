@@ -42,8 +42,6 @@
       # url = "github:hraban/mac-app-util";
       url = "github:markus-fuereder/nix-mac-app-util";
     };
-
-    nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
   };
 
   # OUTPUTS ========================================================================================
@@ -54,7 +52,6 @@
     , home-manager
     , nix-homebrew, homebrew-core, homebrew-cask, homebrew-fvm
     , mac-app-util
-    , nix-vscode-extensions
   }: let username = "markus"; in
   {
     # Expose the package set, including overlays, for convenience.
@@ -84,16 +81,10 @@
               "leoafarias/homebrew-fvm" = homebrew-fvm;
             };
             mutableTaps = false;
-            autoMigrate = true;
+            autoMigrate = false;
           };
         }
-
-
       ];
     };
-
-    # nixpkgs.overlays = [
-    #       nix-vscode-extensions.overlays.default
-    #     ];
   };
 }
