@@ -22,3 +22,8 @@ export ANDROID_PLATFORM_TOOLS=$ANDROID_HOME/platform-tools
 export ANDROID_TOOLS=$ANDROID_HOME/tools
 export ANDROID_CMD_TOOLS=$ANDROID_HOME/cmdline-tools/latest/bin
 export ANDROID=$ANDROID_PLATFORM_TOOLS:$ANDROID_TOOLS:$ANDROID_CMD_TOOLS
+
+# PYENV ================================================================================================================
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init - zsh)"

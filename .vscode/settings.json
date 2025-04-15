@@ -42,6 +42,7 @@
     "pkgs",
     "powerlevel",
     "powerlevel10k",
+    "pyenv",
     "readlink",
     "recents",
     "sdkmanager",
