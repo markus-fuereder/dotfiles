@@ -134,6 +134,7 @@
         "imageoptim" # ......................................................................... Image optimization tool
         "istat-menus" # ......................................................................... System monitoring tool
         "android-studio" # ............................................................. Android development environment
+        "bambu-studio" # ......................................................... 3D printing slicer for Bambu printers
       ];
       masApps = {
         # "Amphetamine" = 937984704; # .................................................................. Keep Mac awake
