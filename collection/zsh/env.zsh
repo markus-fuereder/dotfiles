@@ -5,6 +5,12 @@
 export BIN=/run/current-system/sw/bin/
 export BREW_HOME=/opt/homebrew
 
+# XDG ==================================================================================================================
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
+
 # FVM - Flutter Version Management =====================================================================================
 export FVM_CACHE_PATH=$HOME/.fvm/versions
 

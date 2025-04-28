@@ -1,5 +1,6 @@
 {
   "cSpell.words": [
+    "alacritty",
     "AMPM",
     "appcleaner",
     "appswitcher",
@@ -10,12 +11,14 @@
     "clmv",
     "cmdline",
     "cocoapods",
+    "commitizen",
     "COMPDUMP",
     "conditionalize",
     "dotfiles",
     "Exposé",
     "fira",
     "Flwv",
+    "gitmoji",
     "hilite",
     "histignorealldups",
     "hraban",
