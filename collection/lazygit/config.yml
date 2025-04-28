@@ -1,0 +1,131 @@
+# Config relating to the Lazygit UI
+gui:
+  # Nerd fonts version to use.
+  # One of: '2' | '3' | empty string (default)
+  # If empty, do not show icons.
+  nerdFontsVersion: "3"
+git:
+  # If true, periodically fetch from remote
+  autoFetch: true
+
+  # If true, periodically refresh files and submodules
+  autoRefresh: true
+
+  # If true, pass the --all arg to git fetch
+  fetchAll: true
+
+  # If true, do not allow force pushes
+  disableForcePushing: false
+
+  # If true, parse emoji strings in commit messages e.g. render :rocket: as 🚀
+  # (This should really be under 'gui', not 'git')
+  parseEmoji: true
+os:
+  # What to do when opening Lazygit outside of a git repo.
+  # - 'prompt': (default) ask whether to initialize a new repo or open in the most recent repo
+  # - 'create': initialize a new repo
+  # - 'skip': open most recent repo
+  # - 'quit': exit Lazygit
+  notARepository: "skip"
+
+customCommands:
+  - key: "<c-P>"
+    description: "Push to a specific remote repository"
+    context: "global"
+    loadingText: "Pushing ..."
+    prompts:
+      - type: "menuFromCommand"
+        title: "Which remote repository to push to?"
+        command: bash -c "git remote --verbose | grep '/.* (push)'"
+        filter: '(?P<remote>.*)\s+(?P<url>.*) \(push\)'
+        valueFormat: "{{ .remote }}"
+        labelFormat: "{{ .remote | bold | cyan }} {{ .url }}"
+      - type: "menu"
+        title: "How to push?"
+        options:
+          - value: "push"
+          - value: "push --force-with-lease"
+          - value: "push --force"
+    command: "git {{index .PromptResponses 1}} {{index .PromptResponses 0}}"
+  - key: "<c-f>"
+    description: "fetch a remote branch as a new local branch"
+    command: "git fetch {{index .SelectedRemote.Name }} {{index .PromptResponses 0}}:{{index .PromptResponses 1}}"
+    context: "remotes"
+    prompts:
+      - type: "input"
+        title: "Remote Branch Name"
+        initialValue: ""
+      - type: "input"
+        title: "New Local Branch Name"
+        initialValue: ""
+    loadingText: "fetching branch"
+  - key: "C"
+    command: "git cz c"
+    description: "commit with commitizen"
+    context: "files"
+    loadingText: "opening commitizen commit tool"
+    subprocess: true
+  - key: "<c-v>"
+    description: "Create new conventional commit"
+    context: "global"
+    prompts:
+      - type: "menu"
+        key: "Type"
+        title: "Type of change"
+        options:
+          - name: "build"
+            description: "Changes that affect the build system or external dependencies"
+            value: "build"
+          - name: "feat"
+            description: "A new feature"
+            value: "feat"
+          - name: "fix"
+            description: "A bug fix"
+            value: "fix"
+          - name: "chore"
+            description: "Other changes that don't modify src or test files"
+            value: "chore"
+          - name: "ci"
+            description: "Changes to CI configuration files and scripts"
+            value: "ci"
+          - name: "docs"
+            description: "Documentation only changes"
+            value: "docs"
+          - name: "perf"
+            description: "A code change that improves performance"
+            value: "perf"
+          - name: "refactor"
+            description: "A code change that neither fixes a bug nor adds a feature"
+            value: "refactor"
+          - name: "revert"
+            description: "Reverts a previous commit"
+            value: "revert"
+          - name: "style"
+            description: "Changes that do not affect the meaning of the code"
+            value: "style"
+          - name: "test"
+            description: "Adding missing tests or correcting existing tests"
+            value: "test"
+      - type: "input"
+        title: "Scope"
+        key: "Scope"
+        initialValue: ""
+      # - type: menuFromCommand
+      #   key: emoji
+      #   command: gitmoji -l
+      #   filter: ^(.*?) - (:.*?:) - (.*)$
+      #   labelFormat: "{{ .group_1 }} - {{ .group_3 }}"
+      #   title: "Select a gitmoji:"
+      #   valueFormat: "{{ .group_2 }}"
+      - type: "input"
+        title: "message"
+        key: "Message"
+        initialValue: ""
+      - type: "confirm"
+        key: "Confirm"
+        title: "Commit"
+        # body: "Are you sure you want to commit?\n{{.Form.Type}}{{ if .Form.Scope }}({{ .Form.Scope }}){{ end }}: {{ .Form.emoji }} {{.Form.Message}}"
+        body: "Are you sure you want to commit?\n{{.Form.Type}}{{ if .Form.Scope }}({{ .Form.Scope }}){{ end }}: {{.Form.Message}}"
+    # command: "git commit --message '{{.Form.Type}}{{ if .Form.Scope }}({{ .Form.Scope }}){{ end }}: {{ .Form.emoji }} {{.Form.Message}}'"
+    command: "git commit --message '{{.Form.Type}}{{ if .Form.Scope }}({{ .Form.Scope }}){{ end }}: {{.Form.Message}}'"
+    loadingText: "Creating conventional commit..."
