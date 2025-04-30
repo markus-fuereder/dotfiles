@@ -33,3 +33,8 @@ export ANDROID=$ANDROID_PLATFORM_TOOLS:$ANDROID_TOOLS:$ANDROID_CMD_TOOLS
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init - zsh)"
+
+# RUBY =================================================================================================================
+export RUBY_HOME="$(readlink -f $BIN/ruby)"
+export GEM_HOME=$HOME/.ruby/gems
+mkdir -p $GEM_HOME
