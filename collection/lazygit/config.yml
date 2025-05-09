@@ -106,10 +106,10 @@ customCommands:
           - name: "test"
             description: "Adding missing tests or correcting existing tests"
             value: "test"
-      - type: "input"
-        title: "Scope"
-        key: "Scope"
-        initialValue: ""
+      # - type: "input"
+      #   title: "Scope"
+      #   key: "Scope"
+      #   initialValue: ""
       # - type: menuFromCommand
       #   key: emoji
       #   command: gitmoji -l
@@ -118,7 +118,7 @@ customCommands:
       #   title: "Select a gitmoji:"
       #   valueFormat: "{{ .group_2 }}"
       - type: "input"
-        title: "message"
+        title: "Message"
         key: "Message"
         initialValue: ""
       - type: "confirm"
