@@ -58,6 +58,9 @@
     darwinPackages = self.darwinConfigurations."shared".pkgs;
     darwinConfigurations."shared" = nix-darwin.lib.darwinSystem {
       modules = [
+        {
+            system.primaryUser = username;
+        }
         ./config.nix
         ./darwin.nix
         mac-app-util.darwinCustomModules.default
