@@ -155,6 +155,7 @@
     environment.shellAliases = {
         nix-count-garbage = "nix-store --gc --print-dead | wc -l";
         nix-rebuild = "sudo darwin-rebuild switch --flake \"$(readlink -f ~/.config/nix)#shared\"";
+        sync-dotfiles = "git -C /etc/dotfiles pull";
         cat = "bat";
         ls = "lsd";
         ll = "lsd -l";
