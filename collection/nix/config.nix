@@ -172,5 +172,7 @@
         config_link="sh /etc/dotfiles/link.sh";
         config_pull="sh /etc/dotfiles/pull.sh";
         flutter="fvm flutter";
+        gcd="git checkout develop";
+        gfd="git fetch upstream develop:develop";
     };
 }
