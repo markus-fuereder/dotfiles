@@ -144,6 +144,7 @@
         "android-studio" # ............................................................. Android development environment
         "bambu-studio" # ......................................................... 3D printing slicer for Bambu printers
         "rectangle-pro" # .................................................................. Window management for macOS
+        "shottr" # ..................................................................................... Screenshot tool
       ];
       masApps = {
         "Amphetamine" = 937984704; # .................................................................... Keep Mac awake
