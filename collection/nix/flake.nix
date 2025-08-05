@@ -21,21 +21,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Homebrew -------------------------------------------------------------------------------------
-    nix-homebrew.url = "github:zhaofengli-wip/nix-homebrew";
-    homebrew-core = {
-      url = "github:homebrew/homebrew-core";
-      flake = false;
-    };
-    homebrew-cask = {
-      url = "github:homebrew/homebrew-cask";
-      flake = false;
-    };
-    homebrew-fvm = {
-      url = "github:leoafarias/homebrew-fvm";
-      flake = false;
-    };
-
     # Mac App Util ---------------------------------------------------------------------------------
     mac-app-util = {
       # https://github.com/hraban/mac-app-util
@@ -50,7 +35,6 @@
     , nixpkgs
     , nix-darwin
     , home-manager
-    , nix-homebrew, homebrew-core, homebrew-cask, homebrew-fvm
     , mac-app-util
   }: let username = "markus"; in
   {
@@ -72,20 +56,6 @@
             users.${username} = import ./home.nix;
           };
           users.users.${username}.home = "/Users/${username}";
-        }
-        nix-homebrew.darwinModules.nix-homebrew {
-          nix-homebrew = {
-            enable = true;
-            user = username;
-            enableRosetta = true;
-            taps = {
-              "homebrew/homebrew-core" = homebrew-core;
-              "homebrew/homebrew-cask" = homebrew-cask;
-              "leoafarias/homebrew-fvm" = homebrew-fvm;
-            };
-            mutableTaps = false;
-            autoMigrate = false;
-          };
         }
       ];
     };
