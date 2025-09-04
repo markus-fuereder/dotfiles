@@ -24,8 +24,8 @@
     # Mac App Util ---------------------------------------------------------------------------------
     mac-app-util = {
       # https://github.com/hraban/mac-app-util
-      # url = "github:hraban/mac-app-util";
-      url = "github:markus-fuereder/nix-mac-app-util";
+      url = "github:hraban/mac-app-util";
+      # url = "github:markus-fuereder/nix-mac-app-util";
     };
   };
 
@@ -47,7 +47,7 @@
         }
         ./config.nix
         ./darwin.nix
-        mac-app-util.darwinCustomModules.default
+        mac-app-util.darwinModules.default
         home-manager.darwinModules.home-manager {
           home-manager = {
             useGlobalPkgs = true;
