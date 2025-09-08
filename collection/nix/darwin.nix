@@ -1,5 +1,6 @@
 { pkgs, config, ... }:
 {
+    # https://nix-darwin.github.io/nix-darwin/manual/index.html
     system.defaults = {
         dock = {
             # Whether to display the appswitcher on all displays or only the main one. The default is false.
@@ -163,6 +164,16 @@
             # For example, the Delete key continues to remove text for as long as you hold it down.
             # Slow = 120, Fast = 2.
             KeyRepeat = 2;
+
+            # Configures the trackpad tap behavior. Mode 1 enables tap to click. The default is null
+            #"com.apple.mouse.tapBehavior" = 1;
+        };
+        trackpad = {
+            # Whether to enable trackpad tap to click. The default is false.
+            Clicking = true;
+
+            # Whether to enable three finger drag. The default is false.
+            TrackpadThreeFingerDrag = true;
         };
     };
     system.keyboard = {
