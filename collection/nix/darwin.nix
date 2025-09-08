@@ -166,7 +166,10 @@
             KeyRepeat = 2;
 
             # Configures the trackpad tap behavior. Mode 1 enables tap to click. The default is null
-            #"com.apple.mouse.tapBehavior" = 1;
+            "com.apple.mouse.tapBehavior" = 1;
+
+            # Whether to enable trackpad force click. The default is null
+            "com.apple.trackpad.forceClick" = false;
         };
         trackpad = {
             # Whether to enable trackpad tap to click. The default is false.
