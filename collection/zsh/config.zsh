@@ -43,3 +43,6 @@ bindkey "[A"      history-search-backward # ....................................
 
 # Login message --------------------------------------------------------------------------------------------------------
 touch ~/.hushlogin # .......................................................................... Don't show login message
+
+# Safe-chain
+source ~/.safe-chain/scripts/init-posix.sh # ...................................... Safe-chain Zsh initialization script

@@ -2,4 +2,4 @@
 #! No need to rebuild the nix flake, this will be sourced when the shell starts
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-export PATH=$ANDROID:$PATH
+export PATH=$BREW_HOME/bin:$ANDROID:$NPM_GLOBAL_BIN:$PATH
