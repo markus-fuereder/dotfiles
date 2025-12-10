@@ -38,3 +38,7 @@ eval "$(pyenv init - zsh)"
 export RUBY_HOME="$(readlink -f $BIN/ruby)"
 export GEM_HOME=$HOME/.ruby/gems
 mkdir -p $GEM_HOME
+
+# NPM ==================================================================================================================
+export NPM_HOME=$HOME/.npm-global
+export NPM_GLOBAL_BIN=$NPM_HOME/bin
