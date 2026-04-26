@@ -16,6 +16,8 @@
     "commitizen",
     "COMPDUMP",
     "conditionalize",
+    "corelocationcli",
+    "coreutils",
     "dotfiles",
     "Exposé",
     "fastfetch",
