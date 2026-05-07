@@ -43,3 +43,6 @@ mkdir -p $GEM_HOME
 # NPM ==================================================================================================================
 export NPM_HOME=$HOME/.npm-global
 export NPM_GLOBAL_BIN=$NPM_HOME/bin
+
+# TMUX ================================================================================================================
+export TMUX_PLUGIN_MANAGER_PATH=$HOME/.tmux/plugins

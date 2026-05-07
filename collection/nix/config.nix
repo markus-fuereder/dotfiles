@@ -145,6 +145,7 @@
         "fvm" # ................................................................................ Flutter version manager
         "cocoapods" # ............................................................................... Dependency manager
         "vercel-cli" # ........................................................................ Vercel command-line tool
+        "tpm" # .................................................................................... Tmux plugin manager
       ];
       casks = [
         "docker-desktop" # ................................................................... Containerization platform
@@ -198,5 +199,8 @@
         gcd="git checkout develop";
         gfd="git fetch upstream develop:develop";
         cl="claude";
+        tpm-install="/opt/homebrew/opt/tpm/share/tpm/bin/install_plugins";
+        tpm-update="/opt/homebrew/opt/tpm/share/tpm/bin/update_plugins";
+        tpm-clean="/opt/homebrew/opt/tpm/share/tpm/bin/clean_plugins";
     };
 }
