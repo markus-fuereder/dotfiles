@@ -202,5 +202,8 @@
         tpm-install="/opt/homebrew/opt/tpm/share/tpm/bin/install_plugins";
         tpm-update="/opt/homebrew/opt/tpm/share/tpm/bin/update_plugins";
         tpm-clean="/opt/homebrew/opt/tpm/share/tpm/bin/clean_plugins";
+        ts="tmux new-session -A -s";
+        tk="tmux kill-session -t";
+        tl="tmux list-sessions";
     };
 }
