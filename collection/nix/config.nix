@@ -205,5 +205,6 @@
         ts="tmux new-session -A -s";
         tk="tmux kill-session -t";
         tl="tmux list-sessions";
+        no-sleep="caffeinate -is";
     };
 }
