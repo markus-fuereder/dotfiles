@@ -147,6 +147,7 @@
         "vercel-cli" # ........................................................................ Vercel command-line tool
         "tpm" # .................................................................................... Tmux plugin manager
         "actionlint" # ..................................................... Static checker for GitHub Actions workflows
+        "checkov" # ..................................................::::.:. Static analysis for Infrastructure-as-Code
       ];
       casks = [
         "docker-desktop" # ................................................................... Containerization platform
