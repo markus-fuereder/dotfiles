@@ -7,7 +7,13 @@
     username = "${vars.username}";
     homeDirectory = "/Users/${vars.username}";
     packages = with pkgs; [
+      claude-code
     ];
+
+    sessionPath = [
+      "$HOME/.local/bin"
+    ];
+    file.".local/bin/claude".source = "${pkgs.claude-code}/bin/claude";
   };
 
   # ZSH ================================================================================================================

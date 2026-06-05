@@ -53,7 +53,11 @@
             useGlobalPkgs = true;
             useUserPackages = true;
             backupFileExtension = "backup";
-            extraSpecialArgs.vars.username = username;
+            extraSpecialArgs = {
+              vars = {
+                username = username;
+              };
+            };
             users.${username} = import ./home.nix;
           };
           users.users.${username}.home = "/Users/${username}";
