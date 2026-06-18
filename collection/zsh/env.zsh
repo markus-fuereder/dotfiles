@@ -50,3 +50,12 @@ export TMUX_PLUGIN_MANAGER_PATH=$HOME/.tmux/plugins
 # FNM / NVM ===========================================================================================================
 export FNM_LOGLEVEL=quiet
 
+# Anthropic & Claude
+export CLAUDE_FLOW_ENCRYPT_AT_REST=1
+export NTFY_FRAMELEAP=claude-019e312e-ac81-7af1-96e8-04c8e15b3912
+export CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=45
+
+# AWS
+export AWS_REGION=eu-central-1
+export AWS_DEFAULT_REGION=eu-central-1
+
