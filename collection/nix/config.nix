@@ -149,10 +149,15 @@
         "vercel-cli" # ........................................................................ Vercel command-line tool
         "tpm" # .................................................................................... Tmux plugin manager
         "actionlint" # ..................................................... Static checker for GitHub Actions workflows
-        "checkov" # ..................................................::::.:. Static analysis for Infrastructure-as-Code
+        "checkov" # ......................................................... Static analysis for Infrastructure-as-Code
+        "docker" # .................................................................................. Container Platform
+        "docker-compose" # .................................................................. Container Composition Tool
+        "docker-credential-helper-ecr" # .......................................... Docker credential helper for AWS ECR
+        "colima" # ..................................................................................... Docker runntime
+        "context7-mcp" # ........................................................................ Code Documentation MCP
       ];
       casks = [
-        "docker-desktop" # ................................................................... Containerization platform
+        "1password-cli" # ................................................................................ 1Password CLI
         "kitty" # .................................................................................... Terminal emulator
         "ssh-config-editor" # ................................................................. SSH configuration editor
         "imageoptim" # ......................................................................... Image optimization tool
@@ -165,7 +170,6 @@
         "sublime-text" # ................................................................................... Text Editor
         "chatgpt" # ..................................................................................... ChatGPT Client
         "ankerwork" # ......................................................................... AnkerWork Device Manager
-        # "logitech-g-hub" # ................................................................... Logitech Device Manager
         "corelocationcli" # ........................................................................... GPS Location CLI
         "openvpn-connect" # ............................................................................. OpenVPN Client
         "tailscale-app" # ......................................................................... Tailscale VPN Client
@@ -178,7 +182,7 @@
         # "Pure Paste" = 1611378436; # ........................................................ Paste without formatting
         # "Shareful" = 1522267256; # ...................................................... Share files and links easily
         "Hidden Bar" = 1452453066; # ................................................................ Hide menubar items
-        "Hand Mirror" = 1502839586; # ............................................................... Mirror menubar app
+        #"Hand Mirror" = 1502839586; # .............................................................. Mirror menubar app
         # "WhatsApp Messenger" = 310633997; # ................................................................ Messenger
       };
     };
@@ -212,5 +216,7 @@
         no-sleep="caffeinate -is";
         remote-restart="sudo fdesetup authrestart -delayminutes 1";
         edit-dotfiles="code /etc/dotfiles/";
+        empty-trash="rm -rf ~/.Trash/*";
+        docker-up="colima start >/dev/null 2>&1 || true; docker context use colima";
     };
 }
