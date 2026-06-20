@@ -14,6 +14,12 @@
       "$HOME/.local/bin"
     ];
     file.".local/bin/claude".source = "${pkgs.claude-code}/bin/claude";
+
+    # uv-managed global CLI tools
+    activation.uvTools = lib.hm.dag.entryAfter ["writeBoundary" ] ''
+      export PATH="/Users/markus/.local/bin:$PATH"
+      $DRY_RUN_CMD ${pkgs.uv}/bin/uv tool install graphifyy
+    '';
   };
 
   # ZSH ================================================================================================================
