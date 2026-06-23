@@ -120,6 +120,7 @@
         rtk # ............................................................................................ LLM CLI proxy
         context7-mcp # .......................................................................... Code Documentation MCP
         agent-browser # .................................................. Headless browser automation CLI for AI agents
+        gemini-cli # ........................................................................................ Gemini CLI
 
         # Editors & IDEs -----------------------------------------------------------------------------------------------
         vscode # .................................................................................... Visual Studio Code
@@ -209,7 +210,7 @@
         flutter="fvm flutter";
         gcd="git checkout develop";
         gfd="git fetch upstream develop:develop";
-        cl="claude";
+        cl="headroom wrap claude --no-rtk --no-serena";
         tpm-install="/opt/homebrew/opt/tpm/share/tpm/bin/install_plugins";
         tpm-update="/opt/homebrew/opt/tpm/share/tpm/bin/update_plugins";
         tpm-clean="/opt/homebrew/opt/tpm/share/tpm/bin/clean_plugins";
