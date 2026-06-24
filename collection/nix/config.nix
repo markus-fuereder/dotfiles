@@ -114,6 +114,10 @@
         awscli2 # .............................................................................................. AWS CLI
         openspec # ............................................................................. Spec-driven development
         uv # .................................................................................. Python package installer
+        docker # .................................................................................... Container Platform
+        docker-compose # .................................................................... Container Composition Tool
+        docker-credential-helpers # ..................................................... Credentials Helpers for Docker
+        colima # .............................................................................. Docker Context & Runtime
 
         # AI Tools -----------------------------------------------------------------------------------------------------
         claude-code # ....................................................................................... Claude CLI
@@ -139,13 +143,18 @@
     ];
 
     # HOMEBREW =========================================================================================================
-    # brew cleanup && rm -f $ZSH_COMPDUMP
+    # brew cleanup
     homebrew = {
       enable = true;
       onActivation = {
-        cleanup = "none"; # zap|none
+        # Homebrew dropped the `--force-cleanup` flag that nix-darwin emits for
+        # `cleanup = "zap"`, so activation fails with `invalid option: --force-cleanup`.
+        # Drive the cleanup ourselves via extraFlags instead: `--cleanup` performs a
+        # forced cleanup and `--zap` makes it zap casks — same effect as `cleanup = "zap"`.
+        cleanup = "none"; # was "zap"; see extraFlags below
         autoUpdate = true;
         upgrade = true;
+        extraFlags = [ "--cleanup" "--zap" ];
       };
       brews = [
         "coreutils" # ....................................................................................... Core Utils
@@ -155,10 +164,6 @@
         "tpm" # .................................................................................... Tmux plugin manager
         "actionlint" # ..................................................... Static checker for GitHub Actions workflows
         "checkov" # ......................................................... Static analysis for Infrastructure-as-Code
-        "docker" # .................................................................................. Container Platform
-        "docker-compose" # .................................................................. Container Composition Tool
-        "docker-credential-helper-ecr" # .......................................... Docker credential helper for AWS ECR
-        "colima" # ..................................................................................... Docker runntime
       ];
       casks = [
         "1password-cli" # ................................................................................ 1Password CLI
@@ -180,7 +185,7 @@
         "slack" # ................................................................................... Team collaboration
       ];
       masApps = {
-        "Amphetamine" = 937984704; # .................................................................... Keep Mac awake
+        "Amphetamin" = 937984704; # .................................................................... Keep Mac awake
         "The Unarchiver" = 425424353; # ............................................................... Unarchiving tool
         "Velja" = 1607635845; # .............................................................. Browser routing for macOS
         # "Pure Paste" = 1611378436; # ........................................................ Paste without formatting
@@ -221,6 +226,6 @@
         remote-restart="sudo fdesetup authrestart -delayminutes 1";
         edit-dotfiles="code /etc/dotfiles/";
         empty-trash="rm -rf ~/.Trash/*";
-        docker-up="colima start >/dev/null 2>&1 || true; docker context use colima";
+        docker-up="colima start --vm-type vz && docker context use colima";
     };
 }
