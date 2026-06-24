@@ -25,7 +25,7 @@
     activation.uv = lib.hm.dag.entryAfter ["writeBoundary" ] ''
       export PATH="/Users/markus/.local/bin:$PATH"
       $DRY_RUN_CMD ${pkgs.uv}/bin/uv tool install 'graphifyy'
-      $DRY_RUN_CMD ${pkgs.uv}/bin/uv tool install 'headroom-ai[mcp]'
+      $DRY_RUN_CMD ${pkgs.uv}/bin/uv tool install 'headroom-ai[proxy,mcp]'
     '';
   };
 
