@@ -1,4 +1,14 @@
 { config, pkgs, lib, vars, ... }:
+let
+  # tmux theme — not in nixpkgs, so pin it from upstream.
+  # TPM (loaded by tmux.conf) scans ~/.tmux/plugins and sources monokai.tmux.
+  tmux-monokai-pro = pkgs.fetchFromGitHub {
+    owner = "maxpetretta";
+    repo = "tmux-monokai-pro";
+    rev = "69e378e955ccd9afcb8ad1aa4011f71c80b892d9"; # 2026-02-18
+    hash = "sha256-LlABLru2ODFq8dt6nqPT25lANxe4AAGK1wCqh8F6huM=";
+  };
+in
 {
   # Home Manager =======================================================================================================
   programs.home-manager.enable = true;
@@ -14,6 +24,9 @@
       "$HOME/.local/bin"
     ];
     file.".local/bin/claude".source = "${pkgs.claude-code}/bin/claude";
+
+    # tmux theme plugin, dropped where TPM already looks (~/.tmux/plugins).
+    file.".tmux/plugins/tmux-monokai-pro".source = tmux-monokai-pro;
 
     # set colima as docker context
     activation.colima = lib.hm.dag.entryAfter ["writeBoundary"] ''
