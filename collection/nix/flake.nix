@@ -6,7 +6,7 @@
   inputs = {
     # Nix Packages ---------------------------------------------------------------------------------
     nixpkgs = {
-      url = "github:NixOS/nixpkgs";
+      url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     };
 
     # Nix Darwin -----------------------------------------------------------------------------------
