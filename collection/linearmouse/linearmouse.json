@@ -1,0 +1,17 @@
+{
+  "$schema": "https://schema.linearmouse.app/0.10.2",
+  "schemes": [
+    {
+      "if": {
+        "device": {
+          "vendorID": "0x046d",
+          "category": "mouse"
+        }
+      },
+      "scrolling": {
+        "acceleration": 0,
+        "distance": 3
+      }
+    }
+  ]
+}
