@@ -52,7 +52,7 @@ in
         export SDKROOT="$(/usr/bin/xcrun --show-sdk-path)"
         # Pin to Python 3.13 so packages with C extensions (watchdog) resolve to
         # prebuilt wheels instead of compiling from source on the bleeding-edge 3.14.
-        $DRY_RUN_CMD ${pkgs.uv}/bin/uv tool install --python 3.13 'graphifyy[gemini]' --force
+        $DRY_RUN_CMD ${pkgs.uv}/bin/uv tool install --python 3.13 'graphifyy[gemini,sql]' --force
         $DRY_RUN_CMD ${pkgs.uv}/bin/uv tool install --python 3.13 'headroom-ai[proxy,mcp]'
         $DRY_RUN_CMD ${pkgs.uv}/bin/uv tool install --python 3.13 'markitdown[pdf, docx, pptx, xlsx, xls]'
       )
