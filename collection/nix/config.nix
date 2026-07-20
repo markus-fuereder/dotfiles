@@ -22,6 +22,19 @@
     nixpkgs = {
         config.allowUnfree = true;
         hostPlatform = "aarch64-darwin";
+
+        overlays = [
+            # Work around an upstream packaging bug: commitizen 4.13.9 on nixos-26.05
+            # has a stale test fixture (test_invalid_command) broken by a Python 3.13
+            # argparse change (choices are now quoted), and the darwin build isn't
+            # cached, so it builds from source and the test fails. Skip just that test;
+            # the tool itself is fine.
+            (final: prev: {
+                commitizen = prev.commitizen.overridePythonAttrs (old: {
+                    disabledTests = (old.disabledTests or []) ++ [ "test_invalid_command" ];
+                });
+            })
+        ];
     };
 
     # ZSH ==============================================================================================================
