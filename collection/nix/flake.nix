@@ -5,22 +5,22 @@
   # INPUTS =========================================================================================
   inputs = {
     # Nix Packages ---------------------------------------------------------------------------------
-    # Pinned to the stable release channel for reproducibility. The bare
-    # `nixpkgs-unstable` branch drifted to HEAD on every rebuild (flake.lock is
-    # gitignored), which pulled in a broken lima 2.1.4 (limactl ld crash) via colima.
+    # Tracks nixpkgs-unstable. NOTE: flake.lock is gitignored, so this drifts to
+    # HEAD on every lock refresh — a drift once pulled in a broken lima 2.1.4
+    # (limactl ld crash) via colima; pin back to a release branch if that recurs.
     nixpkgs = {
-      url = "github:NixOS/nixpkgs/nixos-26.05";
+      url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     };
 
     # Nix Darwin -----------------------------------------------------------------------------------
     nix-darwin = {
-      url = "github:nix-darwin/nix-darwin/nix-darwin-26.05";
+      url = "github:nix-darwin/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # Home Manager ---------------------------------------------------------------------------------
     home-manager = {
-      url = "github:nix-community/home-manager/release-26.05";
+      url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
