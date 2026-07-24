@@ -34,6 +34,26 @@
                     disabledTests = (old.disabledTests or []) ++ [ "test_invalid_command" ];
                 });
             })
+            # Work around a nixpkgs packaging bug in apple/container 1.1.0: patchShebangs
+            # rewrites the machine plugin's guest-injected scripts (resources/init,
+            # resources/create-user.sh) to #!/nix/store/...-bash/bin/sh — a macOS host
+            # path. Those scripts run INSIDE the Linux guest as /sbin.machine/init,
+            # where /nix/store doesn't exist, so every `container machine` boot dies
+            # with exec ENOENT. Restore #!/bin/sh, and repoint the bin/ wrappers'
+            # CONTAINER_INSTALL_ROOT at the fixed copy so the launchd services load
+            # the patched plugin resources. Cheap runCommand copy — no Swift rebuild.
+            # Drop this overlay once nixpkgs excludes plugin resources/ from patchShebangs.
+            (final: prev: {
+                container = prev.runCommand prev.container.name {} ''
+                    cp -R ${prev.container} $out
+                    chmod -R u+w $out
+                    for f in $out/libexec/container/plugins/machine-apiserver/resources/init \
+                             $out/libexec/container/plugins/machine-apiserver/resources/create-user.sh; do
+                        sed -i '1s|.*|#!/bin/sh|' "$f"
+                    done
+                    sed -i "s|${prev.container}|$out|g" $out/bin/container $out/bin/container-apiserver
+                '';
+            })
         ];
     };
 
@@ -150,7 +170,8 @@
         # beekeeper-studio # .................................................................. Database management tool
 
         # Tools
-        acli # ....................................................................................... ... Atlassian CLI
+        # acli # ......................................................................................... Atlassian CLI
+        jira-cli-go # ......................................................................................... Jira CLI
 
         # Languages ----------------------------------------------------------------------------------------------------
         ruby_3_4 # ........................................................................... Ruby programming language
