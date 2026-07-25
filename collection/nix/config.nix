@@ -156,6 +156,9 @@
         docker-credential-helpers # ..................................................... Credentials Helpers for Docker
         colima # .............................................................................. Docker Context & Runtime
 
+        # Networking --------------------------------------------------------------------------------------------------
+        socat # ....................................................................... Bidirectional data transfer tool
+
         # AI Tools -----------------------------------------------------------------------------------------------------
         claude-code # ....................................................................................... Claude CLI
         # rtk 0.43.0 tests fail to compile on current rustc (-D warnings + stricter
@@ -269,6 +272,7 @@
         remote-restart="sudo fdesetup authrestart -delayminutes 1";
         edit-dotfiles="code /etc/dotfiles/";
         empty-trash="rm -rf ~/.Trash/*";
+        cm="container machine";
         docker-up="colima start --vm-type vz && docker context use colima";
     };
 }

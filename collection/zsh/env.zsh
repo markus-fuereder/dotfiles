@@ -63,7 +63,7 @@ export AWS_DEFAULT_REGION=eu-central-1
 
 # Domain Delivery Driver
 export D2_DRIVER_POLL_SECONDS="30"
-export D2_DRIVER_CLAUDE_CMD="cl"
+export D2_DRIVER_CLAUDE_CMD="headroom wrap claude --no-rtk --no-serena"
 export D2_DRIVER_WORKTREE_DIR=".worktrees"
 export D2_DRIVER_BRANCH_PREFIX="d2-driver/"
 export D2_DRIVER_TMUX_SESSION="d2d"
