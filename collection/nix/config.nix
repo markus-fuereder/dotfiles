@@ -187,6 +187,28 @@
 
     ];
 
+    # LAUNCHD ==========================================================================================================
+    # `container system start` writes its plist into the app root
+    # (~/Library/Application Support/com.apple.container/apiserver/apiserver.plist) and launchctl-bootstraps it from
+    # there. launchd only auto-loads agents from ~/Library/LaunchAgents at login, so that registration is session-scoped
+    # and dies on every reboot ("apiserver is not running and not registered with launchd").
+    # Declare the agent here instead: nix-darwin copies it to ~/Library/LaunchAgents and `launchctl load -w`s it on
+    # activation, and the store path is re-interpolated on every rebuild, so a container bump plus `nix.gc` can't leave
+    # a dangling ProgramArguments path. Keys mirror upstream SystemStart.swift exactly — note Label must be set
+    # explicitly, since nix-darwin would otherwise prefix it (org.nixos.*) and break the MachServices lookup.
+    launchd.user.agents.container-apiserver.serviceConfig = {
+        Label = "com.apple.container.apiserver";
+        ProgramArguments = [ "${pkgs.container}/bin/container-apiserver" "start" ];
+        EnvironmentVariables = {
+            CONTAINER_INSTALL_ROOT = "${pkgs.container}";
+            CONTAINER_APP_ROOT = "/Users/${config.system.primaryUser}/Library/Application Support/com.apple.container";
+        };
+        MachServices."com.apple.container.apiserver" = true;
+        # Background/System alongside Aqua so the service also loads for headless/SSH sessions.
+        LimitLoadToSessionType = [ "Aqua" "Background" "System" ];
+        RunAtLoad = true;
+    };
+
     # HOMEBREW =========================================================================================================
     # brew cleanup
     homebrew = {
