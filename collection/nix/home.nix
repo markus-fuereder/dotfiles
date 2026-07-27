@@ -23,7 +23,6 @@ in
     sessionPath = [
       "$HOME/.local/bin"
     ];
-    # file.".local/bin/claude".source = "${pkgs.claude-code}/bin/claude";
 
     # tmux theme plugin, dropped where TPM already looks (~/.tmux/plugins).
     file.".tmux/plugins/tmux-monokai-pro".source = tmux-monokai-pro;
@@ -56,6 +55,21 @@ in
         $DRY_RUN_CMD ${pkgs.uv}/bin/uv tool install --python 3.13 'headroom-ai[proxy,mcp]'
         $DRY_RUN_CMD ${pkgs.uv}/bin/uv tool install --python 3.13 'markitdown[pdf, docx, pptx, xlsx, xls]'
       )
+    '';
+    # Claude Code — official native installer, deliberately NOT pkgs.claude-code.
+    # Two reasons nix can't own this one:
+    #   1. Nix can't fetch "latest" purely — sandboxed builds need a fixed output hash.
+    #   2. The native install self-updates in the background into
+    #      ~/.local/share/claude/versions/, which a read-only store can't do.
+    # So this is a bootstrap only: install once on a fresh machine, then Claude Code's own
+    # auto-updater owns the version. The existence guard keeps re-switches from re-downloading.
+    # Do NOT add home.file.".local/bin/claude" — that path is the launcher the installer manages.
+    activation.claudeCode = lib.hm.dag.entryAfter ["writeBoundary"] ''
+      if [ ! -e "$HOME/.local/bin/claude" ]; then
+        # Official install command, store-pinned. Append `stable` after the final `bash` to
+        # track the ~1-week-old channel instead of every release.
+        $DRY_RUN_CMD ${pkgs.curl}/bin/curl -fsSL https://claude.ai/install.sh | ${pkgs.bash}/bin/bash
+      fi
     '';
   };
 
