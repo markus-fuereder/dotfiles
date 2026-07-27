@@ -17,13 +17,13 @@ in
     username = "${vars.username}";
     homeDirectory = "/Users/${vars.username}";
     packages = with pkgs; [
-      claude-code
+      # claude-code
     ];
 
     sessionPath = [
       "$HOME/.local/bin"
     ];
-    file.".local/bin/claude".source = "${pkgs.claude-code}/bin/claude";
+    # file.".local/bin/claude".source = "${pkgs.claude-code}/bin/claude";
 
     # tmux theme plugin, dropped where TPM already looks (~/.tmux/plugins).
     file.".tmux/plugins/tmux-monokai-pro".source = tmux-monokai-pro;

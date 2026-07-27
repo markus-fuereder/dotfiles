@@ -160,7 +160,7 @@
         socat # ....................................................................... Bidirectional data transfer tool
 
         # AI Tools -----------------------------------------------------------------------------------------------------
-        claude-code # ....................................................................................... Claude CLI
+        # claude-code # ....................................................................................... Claude CLI
         # rtk 0.43.0 tests fail to compile on current rustc (-D warnings + stricter
         # dead-code lint); binary builds fine. Drop the override once upstream ships a fix.
         (rtk.overrideAttrs (_: { doCheck = false; })) # ................................................. LLM CLI proxy
@@ -233,7 +233,7 @@
       masApps = {
         "Amphetamin" = 937984704; # .................................................................... Keep Mac awake
         "The Unarchiver" = 425424353; # ............................................................... Unarchiving tool
-        "Velja" = 1607635845; # .............................................................. Browser routing for macOS
+        # "Velja" = 1607635845; # .............................................................. Browser routing for macOS
         # "Pure Paste" = 1611378436; # ........................................................ Paste without formatting
         # "Shareful" = 1522267256; # ...................................................... Share files and links easily
         "Hidden Bar" = 1452453066; # ................................................................ Hide menubar items
