@@ -60,6 +60,14 @@ in
         # converge; once it matches, re-switches are a genuine no-op (no `--force`
         # needed, which would otherwise reinstall on every activation).
         # To upgrade: bump the version here, don't run `uv tool install` by hand.
+        # graphify extras: TS/JS/JSON grammars are core, so only hcl (terraform) and sql
+        # need declaring. Keep this list byte-identical to the CI extractor's — CI writes
+        # graph.json and this CLI only reads it, so they are a pinned writer/reader pair
+        # (frameleap: .graphify-version + docs/environment-setup.md). No LLM-backend extra
+        # belongs here: naming happens in CI, and the read-only verbs need no key.
+        # Deliberately NOT adding `leiden`: graspologic is marked `python_version < "3.13"`
+        # and caps at <3.13 itself, so on our pinned 3.13 the extra resolves to zero
+        # packages and silently changes nothing — clustering stays on the Louvain fallback.
         $DRY_RUN_CMD ${pkgs.uv}/bin/uv tool install --python 3.13 'graphifyy[gemini,sql,terraform]==0.9.30'
         # headroom extras: `proxy` drives `wrap`/`proxy` (and already pulls the MCP deps,
         # so `mcp` is redundant today — kept to declare intent if upstream ever decouples).
