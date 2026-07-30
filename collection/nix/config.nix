@@ -283,7 +283,7 @@
         flutter="fvm flutter";
         gcd="git checkout develop";
         gfd="git fetch upstream develop:develop";
-        cl="headroom wrap claude --no-rtk --no-serena";
+        cl="headroom wrap claude --code-memory none --memory";
         tpm-install="/opt/homebrew/opt/tpm/share/tpm/bin/install_plugins";
         tpm-update="/opt/homebrew/opt/tpm/share/tpm/bin/update_plugins";
         tpm-clean="/opt/homebrew/opt/tpm/share/tpm/bin/clean_plugins";
