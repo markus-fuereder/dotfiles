@@ -275,6 +275,8 @@
         la = "lsd -a";
         lla = "lsd -la";
         l = "lsd -la";
+        gs = "git status";
+        gd = "git diff";
         grep = "rg";
         nvm = "fnm";
         lg = "lazygit";
