@@ -51,9 +51,25 @@ in
         export SDKROOT="$(/usr/bin/xcrun --show-sdk-path)"
         # Pin to Python 3.13 so packages with C extensions (watchdog) resolve to
         # prebuilt wheels instead of compiling from source on the bleeding-edge 3.14.
-        $DRY_RUN_CMD ${pkgs.uv}/bin/uv tool install --python 3.13 'graphifyy[gemini,sql,terraform]' --force
-        $DRY_RUN_CMD ${pkgs.uv}/bin/uv tool install --python 3.13 'headroom-ai[proxy,mcp]'
-        $DRY_RUN_CMD ${pkgs.uv}/bin/uv tool install --python 3.13 'markitdown[pdf, docx, pptx, xlsx, xls]'
+        #
+        # Every tool carries an exact `==` version. This is load-bearing, not cosmetic:
+        # `uv tool install` without a specifier treats an already-installed tool as
+        # satisfying an unpinned requirement and no-ops, so an unpinned line can never
+        # move a version — it silently ratifies whatever is on the machine, including
+        # out-of-band `uv tool install` runs. A changed specifier is what makes uv
+        # converge; once it matches, re-switches are a genuine no-op (no `--force`
+        # needed, which would otherwise reinstall on every activation).
+        # To upgrade: bump the version here, don't run `uv tool install` by hand.
+        $DRY_RUN_CMD ${pkgs.uv}/bin/uv tool install --python 3.13 'graphifyy[gemini,sql,terraform]==0.9.30'
+        # headroom extras: `proxy` drives `wrap`/`proxy` (and already pulls the MCP deps,
+        # so `mcp` is redundant today — kept to declare intent if upstream ever decouples).
+        # `code` adds tree-sitter for AST-based compression, which the proxy enables by
+        # default once the grammars exist (HEADROOM_CODE_AWARE_ENABLED defaults to 1); it
+        # only handles c/cpp/csharp/go/java/js/python/rust/ts, which covers our TS/JS work.
+        # Costs 2 MB to download but ~351 MB on disk, and can't be cherry-picked — the
+        # compressor imports tree_sitter_language_pack directly. No model downloads.
+        $DRY_RUN_CMD ${pkgs.uv}/bin/uv tool install --python 3.13 'headroom-ai[proxy,mcp,code]==0.33.0'
+        $DRY_RUN_CMD ${pkgs.uv}/bin/uv tool install --python 3.13 'markitdown[pdf, docx, pptx, xlsx, xls]==0.1.6'
       )
     '';
     # Claude Code — official native installer, deliberately NOT pkgs.claude-code.
