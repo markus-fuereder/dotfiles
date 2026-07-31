@@ -1,0 +1,146 @@
+# herdr configuration — mirrors collection/tmux/tmux.conf
+# Validate with: herdr config check
+# Apply with:    herdr server reload-config
+#
+# NOTE: herdr silently ignores unknown [keys] action names and unknown
+# [theme.custom] tokens. Typos fail quietly, so keep names exact.
+
+# Onboarding already completed; skip the first-run wizard.
+onboarding = false
+
+# THEME
+[theme]
+# Catppuccin is the base because herdr's custom tokens use its naming.
+name = "catppuccin"
+
+## Monokai Pro, ported from collection/kitty/theme.conf
+[theme.custom]
+accent      = "#85dacc"
+panel_bg    = "#403838"
+surface_dim = "#383030"
+surface0    = "#4a4242"
+surface1    = "#554c4d"
+overlay0    = "#72696a"
+overlay1    = "#8b8283"
+text        = "#fff1f3"
+subtext0    = "#72696a"
+red         = "#fd6883"
+green       = "#adda78"
+yellow      = "#f9cc6c"
+peach       = "#f38d70"
+mauve       = "#a8a9eb"
+teal        = "#85dacc"
+# Monokai Pro has no true blue; kitty maps its blue slot to orange too.
+blue        = "#f38d70"
+
+# TERMINAL
+[terminal]
+# tmux equivalent: split-window -c "#{pane_current_path}"
+new_cwd = "follow"
+
+[keys]
+# LEADER KEY
+# tmux: set -g prefix C-t
+# Pressing ctrl+t twice sends a literal ctrl+t (tmux: bind C-t send-prefix).
+prefix = "ctrl+t"
+
+# WINDOWS (herdr calls them tabs)
+## herdr has no tab positioning, so tmux's new-window -b / -a / -t :=0 have no
+## equivalent. Those four Ctrl+Arrow bindings were dropped.
+## Replaces herdr's default prefix+c.
+new_tab = "prefix+n"
+## Ctrl+Arrow to switch tabs
+## next_tab drops herdr's default prefix+n, which new_tab now uses.
+previous_tab = ["ctrl+left", "prefix+p"]
+next_tab     = "ctrl+right"
+## Rename the selected tab.
+rename_tab   = ["prefix+i", "prefix+shift+t"]
+
+# WORKSPACES
+## Ctrl+Arrow to switch workspaces, matching the tab bindings above.
+## No tmux equivalent; herdr has no default binding for these.
+previous_workspace = "ctrl+up"
+next_workspace     = "ctrl+down"
+## Create a workspace.
+new_workspace      = ["prefix+ctrl+n", "prefix+shift+n"]
+## Rename the selected workspace. ctrl+i is ASCII 0x09, the same byte as Tab,
+## so this shadows prefix+tab (cycle_pane_next) unless the terminal's keyboard
+## protocol keeps them distinct. herdr's config check cannot detect this.
+rename_workspace   = ["prefix+ctrl+i", "prefix+shift+w"]
+
+# AGENTS
+## Cmd+Arrow to cycle the agent panel.
+## Requires the cmd+up/cmd+down no_op lines in collection/kitty/kitty.conf,
+## otherwise kitty consumes them for scrolling.
+previous_agent = "cmd+up"
+next_agent     = "cmd+down"
+## Renaming an agent has no native action; see prefix+cmd+i below.
+
+# PANES
+## Leader > Ctrl+Shift+Arrow to split panes.
+## Left and up splits are shell commands below; herdr splits right/down only.
+split_vertical   = ["prefix+ctrl+shift+right", "prefix+v"]
+split_horizontal = ["prefix+ctrl+shift+down", "prefix+minus"]
+
+## Ctrl+Shift+Arrow to select panes
+focus_pane_left  = ["ctrl+shift+left", "prefix+h"]
+focus_pane_right = ["ctrl+shift+right", "prefix+l"]
+focus_pane_up    = ["ctrl+shift+up", "prefix+k"]
+focus_pane_down  = ["ctrl+shift+down", "prefix+j"]
+
+## Rename the selected pane. ctrl+i is ASCII 0x09, the same byte as Tab, so
+## this relies on kitty's keyboard protocol to stay distinct from prefix+tab
+## (cycle_pane_next). herdr's config check cannot detect that collision.
+rename_pane      = ["prefix+ctrl+shift+i", "prefix+shift+p"]
+
+# CONFIG
+## Reload config
+reload_config = ["prefix+ctrl+r", "prefix+shift+r"]
+
+# COPY MODE
+## tmux: setw -g mode-keys vi — herdr's copy mode is vi-style already.
+copy_mode = "prefix+["
+
+# CUSTOM COMMANDS
+## tmux: split-window -h -b — split right, then swap the new pane leftwards.
+[[keys.command]]
+key = "prefix+ctrl+shift+left"
+type = "shell"
+description = "Split left"
+command = '"$HERDR_BIN_PATH" pane split --pane "$HERDR_ACTIVE_PANE_ID" --direction right --focus && "$HERDR_BIN_PATH" pane swap --current --direction left'
+
+## tmux: split-window -v -b
+[[keys.command]]
+key = "prefix+ctrl+shift+up"
+type = "shell"
+description = "Split up"
+command = '"$HERDR_BIN_PATH" pane split --pane "$HERDR_ACTIVE_PANE_ID" --direction down --focus && "$HERDR_BIN_PATH" pane swap --current --direction up'
+
+## Rename the focused agent. herdr exposes no rename_agent action, so this
+## prompts in a popup and calls the CLI. Falls back to renaming the pane when
+## the focused pane has no detected agent.
+[[keys.command]]
+key = "prefix+cmd+i"
+type = "popup"
+description = "Rename agent"
+width = "60%"
+height = "20%"
+command = 'printf "Agent name: "; read -r name; [ -n "$name" ] && { "$HERDR_BIN_PATH" agent rename "$HERDR_ACTIVE_PANE_ID" "$name" || "$HERDR_BIN_PATH" pane rename "$HERDR_ACTIVE_PANE_ID" "$name"; }'
+
+## tmux: bind C-k send-keys C-l \; clear-history
+## Clears the screen only — herdr has no scrollback-purge API.
+[[keys.command]]
+key = "prefix+ctrl+k"
+type = "shell"
+description = "Clear screen"
+command = '"$HERDR_BIN_PATH" pane send-keys "$HERDR_ACTIVE_PANE_ID" ctrl+l'
+
+# MOUSE / CLIPBOARD
+[ui]
+# tmux: set -g mouse on
+mouse_capture = true
+# tmux: MouseDragEnd1Pane copy-selection-and-cancel
+copy_on_select = true
+# tmux creates windows without prompting for a name.
+prompt_new_tab_name = false
+accent = "#85dacc"
