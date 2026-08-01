@@ -2,6 +2,7 @@
 !.gitignore
 !.vscode/
 !collection/
+!docs/
 
 .DS_Store
 *.bak
