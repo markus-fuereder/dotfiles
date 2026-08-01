@@ -28,7 +28,7 @@
 - Produces: `collection/agents/AGENTS.md` and `collection/agents/CLAUDE.md` at exactly these paths — Task 2's nix symlinks point at `/etc/dotfiles/collection/agents/<name>` (the canonical install path; `/etc` → `/private/etc` on macOS).
 - `CLAUDE.md` line 1 MUST be `@AGENTS.md` (Claude Code import syntax, resolves relative to the file's directory).
 
-- [ ] **Step 1: Create `collection/agents/AGENTS.md`** with exactly this content:
+- [x] **Step 1: Create `collection/agents/AGENTS.md`** with exactly this content:
 
 ````markdown
 # Personal Agent Instructions
@@ -120,7 +120,7 @@ to `rtk` transparently; don't stack (`rtk rtk …`).
   stopping point; don't invent next steps or keep going.
 ````
 
-- [ ] **Step 2: Create `collection/agents/CLAUDE.md`** with exactly this content:
+- [x] **Step 2: Create `collection/agents/CLAUDE.md`** with exactly this content:
 
 ````markdown
 @AGENTS.md
@@ -135,12 +135,12 @@ to `rtk` transparently; don't stack (`rtk rtk …`).
   routine work escalates to think/debug → tell the user to switch up.
 ````
 
-- [ ] **Step 3: Verify the files are tracked and well-formed**
+- [x] **Step 3: Verify the files are tracked and well-formed**
 
 Run: `git -C /etc/dotfiles status --short collection/agents/ && head -1 /etc/dotfiles/collection/agents/CLAUDE.md`
 Expected: both files listed as untracked/added (NOT ignored — `collection/` is whitelisted in `.gitignore`); first line of CLAUDE.md is exactly `@AGENTS.md`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git -C /etc/dotfiles add collection/agents/
@@ -159,7 +159,7 @@ git -C /etc/dotfiles commit -m "feat: Add versioned global agent instructions"
 - Produces: `~/.claude/AGENTS.md` and `~/.claude/CLAUDE.md` symlinks after the next `darwin-rebuild switch` (Task 3 verifies).
 - `home.nix`'s module args already include `config` (line 1), which provides `config.lib.file.mkOutOfStoreSymlink`.
 
-- [ ] **Step 1: Add the two symlink entries to `home.nix`**
+- [x] **Step 1: Add the two symlink entries to `home.nix`**
 
 Insert directly after line 28 (`file.".tmux/plugins/tmux-monokai-pro".source = tmux-monokai-pro;`):
 
@@ -179,12 +179,12 @@ Insert directly after line 28 (`file.".tmux/plugins/tmux-monokai-pro".source = t
 
 (Repeated `file.…` attrpaths merge in Nix; no restructuring of the existing tmux line is needed.)
 
-- [ ] **Step 2: Syntax-check the flake**
+- [x] **Step 2: Syntax-check the flake**
 
 Run: `nix --extra-experimental-features "nix-command flakes" flake check "$(readlink -f ~/.config/nix)" 2>&1 | tail -5`
 Expected: no evaluation errors mentioning `home.nix` (pre-existing warnings are fine).
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git -C /etc/dotfiles add collection/nix/home.nix
@@ -201,28 +201,28 @@ git -C /etc/dotfiles commit -m "feat: Deploy global agent instructions via home-
 **Interfaces:**
 - Consumes: Task 2's home-manager entries.
 
-- [ ] **Step 1: Rebuild** (needs sudo — if the session can't elevate, ask the user to run it, e.g. via `! sudo darwin-rebuild switch --flake "$(readlink -f ~/.config/nix)#shared"`)
+- [x] **Step 1: Rebuild** (needs sudo — if the session can't elevate, ask the user to run it, e.g. via `! sudo darwin-rebuild switch --flake "$(readlink -f ~/.config/nix)#shared"`)
 
 Run: `sudo darwin-rebuild switch --flake "$(readlink -f ~/.config/nix)#shared"`
 Expected: activation completes without error.
 
-- [ ] **Step 2: Verify the link chain**
+- [x] **Step 2: Verify the link chain**
 
 Run: `readlink ~/.claude/CLAUDE.md ~/.claude/AGENTS.md && cat ~/.claude/CLAUDE.md | head -1`
 Expected: both are symlinks (into the home-manager store indirection, which itself points at `/etc/dotfiles/collection/agents/…`); `cat` succeeds and prints `@AGENTS.md` — proving the chain resolves.
 
-- [ ] **Step 3: Verify live-edit (no rebuild)**
+- [x] **Step 3: Verify live-edit (no rebuild)**
 
 Run: `printf '\n<!-- live-edit probe -->\n' >> /etc/dotfiles/collection/agents/AGENTS.md && tail -1 ~/.claude/AGENTS.md && git -C /etc/dotfiles checkout collection/agents/AGENTS.md`
 Expected: `tail` shows `<!-- live-edit probe -->` through `~/.claude/AGENTS.md` without any rebuild; checkout restores the file.
 
-- [ ] **Step 4: Manual session check (user)**
+- [x] **Step 4: Manual session check (user)**
 
 Ask the user to run `/context` in a NEW Claude Code session and confirm the user CLAUDE.md appears under **Memory files** (import expanded — answer-style content present).
 
-- [ ] **Step 5: Delete stale backups** (only after Steps 1–4 pass)
+- [x] **Step 5: Delete stale backups** (only after Steps 1–4 pass)
 
 Run: `rm ~/.claude/CLAUDE.md.bak ~/.claude/RTK.md.bak && ls ~/.claude/*.bak 2>&1`
 Expected: `ls` reports no matches.
 
-- [ ] **Step 6: Done** — no commit (host-state cleanup only). Report completion.
+- [x] **Step 6: Done** — no commit (host-state cleanup only). Report completion.
