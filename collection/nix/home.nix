@@ -27,6 +27,18 @@ in
     # tmux theme plugin, dropped where TPM already looks (~/.tmux/plugins).
     file.".tmux/plugins/tmux-monokai-pro".source = tmux-monokai-pro;
 
+    # Global agent instructions — AGENTS.md is the canonical cross-agent file,
+    # CLAUDE.md a thin shim (@AGENTS.md import + Claude-only bits). Claude Code
+    # does not read AGENTS.md natively, hence the shim. Out-of-store symlinks,
+    # NOT store copies: edits in /etc/dotfiles (incl. via /memory) apply
+    # instantly without a rebuild, while every switch still (re)creates the
+    # links. Both live in ~/.claude/ so the relative @AGENTS.md import resolves
+    # whether Claude reads it through the link or its target.
+    file.".claude/AGENTS.md".source =
+      config.lib.file.mkOutOfStoreSymlink "/etc/dotfiles/collection/agents/AGENTS.md";
+    file.".claude/CLAUDE.md".source =
+      config.lib.file.mkOutOfStoreSymlink "/etc/dotfiles/collection/agents/CLAUDE.md";
+
     # set colima as docker context
     activation.colima = lib.hm.dag.entryAfter ["writeBoundary"] ''
       # Run in a subshell so the PATH change stays local: exporting it here would
