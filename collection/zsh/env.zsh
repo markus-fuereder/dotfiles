@@ -33,7 +33,8 @@ export ANDROID=$ANDROID_PLATFORM_TOOLS:$ANDROID_TOOLS:$ANDROID_CMD_TOOLS
 # PYENV ================================================================================================================
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init - zsh)"
+# --no-rehash: startup rehash races when shells get killed mid-run (d2-driver/tmux) and strands the .pyenv-shim lock; rehash manually after pyenv/pip installs
+eval "$(pyenv init - --no-rehash zsh)"
 
 # RUBY =================================================================================================================
 export RUBY_HOME="$(readlink -f $BIN/ruby)"
