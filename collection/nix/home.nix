@@ -8,16 +8,6 @@ let
     rev = "69e378e955ccd9afcb8ad1aa4011f71c80b892d9"; # 2026-02-18
     hash = "sha256-LlABLru2ODFq8dt6nqPT25lANxe4AAGK1wCqh8F6huM=";
   };
-
-  # Keyboard-driven selection kitten for kitty — also not in nixpkgs. herdr's
-  # copy mode only recolors the foreground, which is invisible over already
-  # white text, so selection is done on kitty's side instead.
-  kitty-grab = pkgs.fetchFromGitHub {
-    owner = "yurikhan";
-    repo = "kitty_grab";
-    rev = "969e363295b48f62fdcbf29987c77ac222109c41"; # 2025-09-29
-    hash = "sha256-DamZpYkyVjxRKNtW5LTLX1OU47xgd/ayiimDorVSamE=";
-  };
 in
 {
   # Home Manager =======================================================================================================
@@ -36,11 +26,6 @@ in
 
     # tmux theme plugin, dropped where TPM already looks (~/.tmux/plugins).
     file.".tmux/plugins/tmux-monokai-pro".source = tmux-monokai-pro;
-
-    # kitty has no plugin directory to scan, so the location is arbitrary and
-    # kitty.conf names it explicitly. It must stay outside ~/.config/kitty,
-    # which is a symlink into the dotfiles repo.
-    file.".local/share/kitty_grab".source = kitty-grab;
 
     # Global agent instructions — AGENTS.md is the canonical cross-agent file,
     # CLAUDE.md a thin shim (@AGENTS.md import + Claude-only bits). Claude Code
