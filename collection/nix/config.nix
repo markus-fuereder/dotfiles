@@ -232,6 +232,7 @@
         "tpm" # .................................................................................... Tmux plugin manager
         "actionlint" # ..................................................... Static checker for GitHub Actions workflows
         "checkov" # ......................................................... Static analysis for Infrastructure-as-Code
+        "docker-credential-helper-ecr" # ............................................. Docker Credentials Helper For ECR
       ];
       casks = [
         "1password-cli" # ................................................................................ 1Password CLI
