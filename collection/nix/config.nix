@@ -272,6 +272,10 @@
         nix-rebuild = "sudo darwin-rebuild switch --flake \"$(readlink -f ~/.config/nix)#shared\"";
         sync-dotfiles = "git -C /etc/dotfiles pull";
         cat = "bat";
+        # nvim is configured declaratively via nixvim (collection/nix/nvim). pkgs.vim stays in
+        # systemPackages as an escape hatch — reach it as `\vim` if this config ever breaks.
+        vim = "nvim";
+        v = "nvim";
         ls = "lsd";
         ll = "lsd -l";
         la = "lsd -a";

@@ -2,14 +2,49 @@
 let
   # tmux theme — not in nixpkgs, so pin it from upstream.
   # TPM (loaded by tmux.conf) scans ~/.tmux/plugins and sources monokai.tmux.
-  tmux-monokai-pro = pkgs.fetchFromGitHub {
+  tmux-monokai-pro-src = pkgs.fetchFromGitHub {
     owner = "maxpetretta";
     repo = "tmux-monokai-pro";
     rev = "69e378e955ccd9afcb8ad1aa4011f71c80b892d9"; # 2026-02-18
     hash = "sha256-LlABLru2ODFq8dt6nqPT25lANxe4AAGK1wCqh8F6huM=";
   };
+
+  # Retheme the status bar from Monokai Pro's "pro" filter to "ristretto", so tmux, kitty
+  # (collection/kitty/theme.conf) and nvim (collection/nix/nvim/default.nix) all agree. Upstream
+  # hardcodes its palette as plain shell locals in scripts/monokai.sh with no @monokai-* option to
+  # override, so patching the source is the only route — same runCommand+sed idiom config.nix already
+  # uses for `container`. All 12 colours live in that one file, each appearing exactly once.
+  #
+  # `--replace-fail` is load-bearing: if a future `rev` bump renames or restyles a colour, the build
+  # FAILS loudly instead of silently leaving half the bar on the old palette.
+  #
+  # Note upstream's two misnomers, preserved here: its `magenta` holds an orange and its `cyan` holds
+  # a purple, so those map to ristretto's accent2/accent6 rather than to anything magenta or cyan.
+  tmux-monokai-pro = pkgs.runCommand "tmux-monokai-pro-ristretto" { } ''
+    cp -R ${tmux-monokai-pro-src} $out
+    chmod -R u+w $out
+    substituteInPlace $out/scripts/monokai.sh \
+      --replace-fail '#fcfcfa' '#fff1f3' \
+      --replace-fail '#2d2a2e' '#2c2525' \
+      --replace-fail '#403e41' '#403838' \
+      --replace-fail '#727072' '#72696a' \
+      --replace-fail '#ff6188' '#fd6883' \
+      --replace-fail '#a9dc76' '#adda78' \
+      --replace-fail '#ffd866' '#f9cc6c' \
+      --replace-fail '#78dce8' '#85dacc' \
+      --replace-fail '#fc9867' '#f38d70' \
+      --replace-fail '#ab9df2' '#a8a9eb' \
+      --replace-fail '#5B595C' '#5b5353' \
+      --replace-fail '#5b595c' '#5b5353'
+  '';
 in
 {
+  # Imports ============================================================================================================
+  # ./nvim holds the declarative Neovim config. It lives INSIDE collection/nix on purpose:
+  # link.sh globs only the top level of collection/, so a top-level collection/nvim/ would be
+  # symlinked to ~/.config/nvim and shadow the store-generated config. This path is invisible to it.
+  imports = [ ./nvim ];
+
   # Home Manager =======================================================================================================
   programs.home-manager.enable = true;
   home = {

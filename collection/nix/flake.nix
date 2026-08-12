@@ -24,6 +24,17 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Nixvim ---------------------------------------------------------------------------------------
+    # Declarative Neovim: plugins, options and keymaps are all Nix, materialised into a
+    # store-immutable config. No runtime plugin manager, so no lockfile to drift.
+    # Deliberately NO `inputs.nixpkgs.follows` here — upstream recommends against overriding it,
+    # and nixvim's `main` branch already targets nixpkgs-unstable, which this flake tracks. Since
+    # home-manager runs with `useGlobalPkgs`, the module builds against our pkgs either way; the
+    # cost of not following is one extra nixpkgs entry in flake.lock, not duplicate builds.
+    nixvim = {
+      url = "github:nix-community/nixvim";
+    };
+
     # Mac App Util ---------------------------------------------------------------------------------
     mac-app-util = {
       # https://github.com/hraban/mac-app-util
@@ -38,6 +49,7 @@
     , nixpkgs
     , nix-darwin
     , home-manager
+    , nixvim
     , mac-app-util
   }: let username = "markus"; in
   {
@@ -61,7 +73,14 @@
                 username = username;
               };
             };
-            users.${username} = import ./home.nix;
+            # imports list rather than a bare `import ./home.nix`, so the nixvim home-manager
+            # module lands in the same user config that home.nix extends.
+            users.${username} = {
+              imports = [
+                ./home.nix
+                nixvim.homeModules.nixvim
+              ];
+            };
           };
           users.users.${username}.home = "/Users/${username}";
         }

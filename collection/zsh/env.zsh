@@ -1,7 +1,17 @@
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #! No need to rebuild the nix flake, this will be sourced when the shell starts
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-export TERM=xterm
+
+# Terminal =============================================================================================================
+# xterm-256color, not plain xterm: nvim reads terminfo for undercurl (LSP diagnostics) and italics,
+# which the 8-colour xterm entry doesn't advertise. Truecolor still comes from kitty's COLORTERM.
+export TERM=xterm-256color
+
+# EDITOR ===============================================================================================================
+# nvim is configured declaratively via nixvim (collection/nix/nvim). This is what git, commitizen
+# and gh open for commit messages and interactive edits.
+export EDITOR=nvim
+export VISUAL=nvim
 
 export BIN=/run/current-system/sw/bin/
 export BREW_HOME=/opt/homebrew
@@ -58,13 +68,16 @@ export CLAUDE_CODE_AUTO_COMPACT_WINDOW=100000000
 export CLAUDE_CODE_MAX_SUBAGENTS_PER_SESSION=9999
 export CLAUDE_CODE_DISABLE_AUTO_MEMORY=1
 
+export CLAUDE_CMD="headroom wrap claude --code-memory none --memory"
+
+
 # AWS
 export AWS_REGION=eu-central-1
 export AWS_DEFAULT_REGION=eu-central-1
 
 # Domain Delivery Driver
 export D2_DRIVER_POLL_SECONDS="30"
-export D2_DRIVER_CLAUDE_CMD="headroom wrap claude --code-memory none --memory"
+export D2_DRIVER_CLAUDE_CMD="$CLAUDE_CMD"
 export D2_DRIVER_WORKTREE_DIR=".worktrees"
 export D2_DRIVER_BRANCH_PREFIX="d2-driver/"
 export D2_DRIVER_TMUX_SESSION="d2d"
