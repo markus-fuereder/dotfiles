@@ -1,308 +1,320 @@
 { pkgs, config, ... }:
 {
-    # SYSTEM ===========================================================================================================
-    # The `system.stateVersion` option is not defined in your nix-darwin configuration. The value is used to
-    # conditionalize backwards‐incompatible changes in default settings. You should usually set this once when
-    # installing nix-darwin on a new system and then never change it (at least without reading all the relevant entries
-    # in the changelog using `darwin-rebuild changelog`).
-    # So, do not change this value
-    system.stateVersion = 6;
+  # SYSTEM ===========================================================================================================
+  # The `system.stateVersion` option is not defined in your nix-darwin configuration. The value is used to
+  # conditionalize backwards‐incompatible changes in default settings. You should usually set this once when
+  # installing nix-darwin on a new system and then never change it (at least without reading all the relevant entries
+  # in the changelog using `darwin-rebuild changelog`).
+  # So, do not change this value
+  system.stateVersion = 6;
 
-    # NIX ==============================================================================================================
-    nix = {
-        settings.experimental-features = "nix-command flakes";
-        optimise.automatic = true;
-        gc = {
-            automatic = true;
-            options = "--delete-older-than 1w";
-        };
+  # NIX ==============================================================================================================
+  nix = {
+    settings.experimental-features = "nix-command flakes";
+    optimise.automatic = true;
+    gc = {
+      automatic = true;
+      options = "--delete-older-than 1w";
     };
+  };
 
-    # NIX PKGS =========================================================================================================
-    nixpkgs = {
-        config.allowUnfree = true;
-        hostPlatform = "aarch64-darwin";
+  # NIX PKGS =========================================================================================================
+  nixpkgs = {
+    config.allowUnfree = true;
+    hostPlatform = "aarch64-darwin";
 
-        overlays = [
-            # Work around an upstream packaging bug: commitizen 4.13.9 on nixos-26.05
-            # has a stale test fixture (test_invalid_command) broken by a Python 3.13
-            # argparse change (choices are now quoted), and the darwin build isn't
-            # cached, so it builds from source and the test fails. Skip just that test;
-            # the tool itself is fine.
-            (final: prev: {
-                commitizen = prev.commitizen.overridePythonAttrs (old: {
-                    disabledTests = (old.disabledTests or []) ++ [ "test_invalid_command" ];
-                });
-            })
-            # Work around a nixpkgs packaging bug in apple/container 1.1.0: patchShebangs
-            # rewrites the machine plugin's guest-injected scripts (resources/init,
-            # resources/create-user.sh) to #!/nix/store/...-bash/bin/sh — a macOS host
-            # path. Those scripts run INSIDE the Linux guest as /sbin.machine/init,
-            # where /nix/store doesn't exist, so every `container machine` boot dies
-            # with exec ENOENT. Restore #!/bin/sh, and repoint the bin/ wrappers'
-            # CONTAINER_INSTALL_ROOT at the fixed copy so the launchd services load
-            # the patched plugin resources. Cheap runCommand copy — no Swift rebuild.
-            # Drop this overlay once nixpkgs excludes plugin resources/ from patchShebangs.
-            (final: prev: {
-                container = prev.runCommand prev.container.name {} ''
-                    cp -R ${prev.container} $out
-                    chmod -R u+w $out
-                    for f in $out/libexec/container/plugins/machine-apiserver/resources/init \
-                             $out/libexec/container/plugins/machine-apiserver/resources/create-user.sh; do
-                        sed -i '1s|.*|#!/bin/sh|' "$f"
-                    done
-                    sed -i "s|${prev.container}|$out|g" $out/bin/container $out/bin/container-apiserver
-                '';
-            })
-        ];
-    };
-
-    # ZSH ==============================================================================================================
-    programs.zsh = {
-        enable = true;
-        enableCompletion = true;
-        enableSyntaxHighlighting = true;
-        enableFzfCompletion = true;
-        enableFzfGit = true;
-        enableFzfHistory = true;
-        # Initialization script for zsh --------------------------------------------------------------------------------
-        shellInit = ''
-            # Powerlevel10k ............................................................................................
-            source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme
-            source /etc/dotfiles/collection/powerlevel10k/p10k.zsh
-            if [[ -r "''${XDG_CACHE_HOME:-''$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh" ]]; then
-                source "''${XDG_CACHE_HOME:-''$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh"
-            fi
-
-            # Autosuggestions ..........................................................................................
-            source ${pkgs.zsh-autosuggestions}/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-
-            # Syntax-Highlighting ......................................................................................
-            source ${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
-            # fnm / nvm autoload .......................................................................................
-            eval "$(fnm env --use-on-cd --shell zsh)"
-
-            # ZSH Config, flags, styles & environment variables ........................................................
-            source /etc/dotfiles/collection/zsh/config.zsh
-
-            # Environment ..............................................................................................
-            source /etc/dotfiles/collection/zsh/env.zsh
+    overlays = [
+      # Work around an upstream packaging bug: commitizen 4.13.9 on nixos-26.05
+      # has a stale test fixture (test_invalid_command) broken by a Python 3.13
+      # argparse change (choices are now quoted), and the darwin build isn't
+      # cached, so it builds from source and the test fails. Skip just that test;
+      # the tool itself is fine.
+      (final: prev: {
+        commitizen = prev.commitizen.overridePythonAttrs (old: {
+          disabledTests = (old.disabledTests or [ ]) ++ [ "test_invalid_command" ];
+        });
+      })
+      # Work around a nixpkgs packaging bug in apple/container 1.1.0: patchShebangs
+      # rewrites the machine plugin's guest-injected scripts (resources/init,
+      # resources/create-user.sh) to #!/nix/store/...-bash/bin/sh — a macOS host
+      # path. Those scripts run INSIDE the Linux guest as /sbin.machine/init,
+      # where /nix/store doesn't exist, so every `container machine` boot dies
+      # with exec ENOENT. Restore #!/bin/sh, and repoint the bin/ wrappers'
+      # CONTAINER_INSTALL_ROOT at the fixed copy so the launchd services load
+      # the patched plugin resources. Cheap runCommand copy — no Swift rebuild.
+      # Drop this overlay once nixpkgs excludes plugin resources/ from patchShebangs.
+      (final: prev: {
+        container = prev.runCommand prev.container.name { } ''
+          cp -R ${prev.container} $out
+          chmod -R u+w $out
+          for f in $out/libexec/container/plugins/machine-apiserver/resources/init \
+                   $out/libexec/container/plugins/machine-apiserver/resources/create-user.sh; do
+              sed -i '1s|.*|#!/bin/sh|' "$f"
+          done
+          sed -i "s|${prev.container}|$out|g" $out/bin/container $out/bin/container-apiserver
         '';
-    };
-
-    # PACKAGES =========================================================================================================
-    environment.systemPackages = with pkgs; [
-        # Hardware -----------------------------------------------------------------------------------------------------
-        karabiner-elements # ................................................................... Keyboard remapping tool
-
-        # Fonts --------------------------------------------------------------------------------------------------------
-        meslo-lgs-nf # ..................................................................... Nerd Font for Powerlevel10k
-        fira-code # ................................................................................... Programming font
-
-        # Shell & Terminal ---------------------------------------------------------------------------------------------
-        oh-my-zsh # .................................................................................. Framework for zsh
-        zsh-powerlevel10k # ................................................................ Theme powerlevel10k for zsh
-        zsh-autosuggestions # ........................................................... Plugin autosuggestions for zsh
-        zsh-syntax-highlighting # ................................................... Plugin syntax highlighting for zsh
-        tmux # .................................................................................... Terminal Multiplexer
-        herdr # ............................................................................. Agent Terminal Multiplexer
-        wget # .................................................................................... HTTP client cli tool
-        mosh # ............................................................................................ Mobile Shell
-        htop # .............................................................................. Interactive process viewer
-        glances # ............................................................................... System Monitoring Tool
-
-        # CLI Tools ----------------------------------------------------------------------------------------------------
-        fastfetch # ......................................................................... Display system information
-        watch # ......................................................................... Execute a program periodically
-        vim # .............................................................................................. Text editor
-        git # .......................................................................................... Version control
-        lazygit # .................................................................................. Terminal UI for git
-        gitmoji-cli # ................................................................................ Emoji CLI for git
-        github-cli # ........................................................................................ GitHub CLI
-        commitizen # ........................................................................... CLI for commit messages
-        mkalias # ....................................................................................... Create aliases
-        bat # .................................................................................... Replacement for `cat`
-        lsd # ..................................................................................... Replacement for `ls`
-        # eza # ................................................................................... Replacement for `ls`
-        zoxide # .................................................................................. Replacement for `cd`
-        fzf # ............................................................................................. Fuzzy finder
-        pay-respects # ................................................. Correct previous console command like "thefuck"
-        jless # ............................................................................................ JSON viewer
-        ripgrep # .............................................................................. Search files with regex
-        imagemagick # .......................................................................... Image manipulation tool
-        gzip # ................................................................................... File compression tool
-        mas # ..................................................................... Mac App Store command line interface
-        scc # ........................................................................... Sloc, code and comment counter
-        secretspec # ............................................................................... Declarative secrets
-
-        # Development Tools --------------------------------------------------------------------------------------------
-        xcodes # ....................................................................... CLI to install and switch Xcode
-        fnm # ............................................................................. fast Node.js version manager
-        yarn # ................................................................................. Node.js package manager
-        pyenv # ................................................................................. Python version manager
-        fastlane # .................................................................... Mobile app build automation tool
-        openjdk17 # ............................................................................... Java Development Kit
-        postman # ...................................................................................... API development
-        gitleaks # .......................................................................................... GitHub CLI
-        act # ....................................................................................... GitHub Actions CLI
-        stripe-cli # ........................................................................................ Stripe CLI
-        terraform # ..................................................................... Infrastructure management tool
-        awscli2 # .............................................................................................. AWS CLI
-        openspec # ............................................................................. Spec-driven development
-        uv # .................................................................................. Python package installer
-        container # .................................................................... macOS native Container Platform
-        docker # .................................................................................... Container Platform
-        docker-compose # .................................................................... Container Composition Tool
-        docker-credential-helpers # ..................................................... Credentials Helpers for Docker
-        colima # .............................................................................. Docker Context & Runtime
-
-        # Networking --------------------------------------------------------------------------------------------------
-        socat # ....................................................................... Bidirectional data transfer tool
-
-        # AI Tools -----------------------------------------------------------------------------------------------------
-        # claude-code # ....................................................................................... Claude CLI
-        # rtk 0.43.0 tests fail to compile on current rustc (-D warnings + stricter
-        # dead-code lint); binary builds fine. Drop the override once upstream ships a fix.
-        (rtk.overrideAttrs (_: { doCheck = false; })) # ................................................. LLM CLI proxy
-        context7-mcp # .......................................................................... Code Documentation MCP
-        agent-browser # .................................................. Headless browser automation CLI for AI agents
-        gemini-cli # ........................................................................................ Gemini CLI
-
-        # Editors & IDEs -----------------------------------------------------------------------------------------------
-        vscode # .................................................................................... Visual Studio Code
-        # beekeeper-studio # .................................................................. Database management tool
-
-        # Tools
-        # acli # ......................................................................................... Atlassian CLI
-        jira-cli-go # ......................................................................................... Jira CLI
-
-        # Languages ----------------------------------------------------------------------------------------------------
-        ruby_3_4 # ........................................................................... Ruby programming language
-
-        # Apps ---------------------------------------------------------------------------------------------------------
-        # _1password-gui # ............................................................................ Password manager
-        # rectangle-pro # .................................................................. Window management for macOS
-        obsidian # ................................................................ Note-taking and knowledge management
-        appcleaner # ......................................................................... App uninstaller for macOS
-
+      })
     ];
+  };
 
-    # LAUNCHD ==========================================================================================================
-    # `container system start` writes its plist into the app root
-    # (~/Library/Application Support/com.apple.container/apiserver/apiserver.plist) and launchctl-bootstraps it from
-    # there. launchd only auto-loads agents from ~/Library/LaunchAgents at login, so that registration is session-scoped
-    # and dies on every reboot ("apiserver is not running and not registered with launchd").
-    # Declare the agent here instead: nix-darwin copies it to ~/Library/LaunchAgents and `launchctl load -w`s it on
-    # activation, and the store path is re-interpolated on every rebuild, so a container bump plus `nix.gc` can't leave
-    # a dangling ProgramArguments path. Keys mirror upstream SystemStart.swift exactly — note Label must be set
-    # explicitly, since nix-darwin would otherwise prefix it (org.nixos.*) and break the MachServices lookup.
-    launchd.user.agents.container-apiserver.serviceConfig = {
-        Label = "com.apple.container.apiserver";
-        ProgramArguments = [ "${pkgs.container}/bin/container-apiserver" "start" ];
-        EnvironmentVariables = {
-            CONTAINER_INSTALL_ROOT = "${pkgs.container}";
-            CONTAINER_APP_ROOT = "/Users/${config.system.primaryUser}/Library/Application Support/com.apple.container";
-        };
-        MachServices."com.apple.container.apiserver" = true;
-        # Background/System alongside Aqua so the service also loads for headless/SSH sessions.
-        LimitLoadToSessionType = [ "Aqua" "Background" "System" ];
-        RunAtLoad = true;
+  # ZSH ==============================================================================================================
+  programs.zsh = {
+    enable = true;
+    enableCompletion = true;
+    enableSyntaxHighlighting = true;
+    enableFzfCompletion = true;
+    enableFzfGit = true;
+    enableFzfHistory = true;
+    # Initialization script for zsh --------------------------------------------------------------------------------
+    shellInit = ''
+      # Powerlevel10k ............................................................................................
+      source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme
+      source /etc/dotfiles/collection/powerlevel10k/p10k.zsh
+      if [[ -r "''${XDG_CACHE_HOME:-''$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh" ]]; then
+          source "''${XDG_CACHE_HOME:-''$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh"
+      fi
+
+      # Autosuggestions ..........................................................................................
+      source ${pkgs.zsh-autosuggestions}/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+      # Syntax-Highlighting ......................................................................................
+      source ${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+      # fnm / nvm autoload .......................................................................................
+      eval "$(fnm env --use-on-cd --shell zsh)"
+
+      # ZSH Config, flags, styles & environment variables ........................................................
+      source /etc/dotfiles/collection/zsh/config.zsh
+
+      # Environment ..............................................................................................
+      source /etc/dotfiles/collection/zsh/env.zsh
+    '';
+  };
+
+  # PACKAGES =========================================================================================================
+  environment.systemPackages = with pkgs; [
+    # Hardware -----------------------------------------------------------------------------------------------------
+    karabiner-elements # ................................................................... Keyboard remapping tool
+
+    # Fonts --------------------------------------------------------------------------------------------------------
+    meslo-lgs-nf # ..................................................................... Nerd Font for Powerlevel10k
+    fira-code # ................................................................................... Programming font
+
+    # Shell & Terminal ---------------------------------------------------------------------------------------------
+    oh-my-zsh # .................................................................................. Framework for zsh
+    zsh-powerlevel10k # ................................................................ Theme powerlevel10k for zsh
+    zsh-autosuggestions # ........................................................... Plugin autosuggestions for zsh
+    zsh-syntax-highlighting # ................................................... Plugin syntax highlighting for zsh
+    tmux # .................................................................................... Terminal Multiplexer
+    herdr # ............................................................................. Agent Terminal Multiplexer
+    wget # .................................................................................... HTTP client cli tool
+    mosh # ............................................................................................ Mobile Shell
+    htop # .............................................................................. Interactive process viewer
+    glances # ............................................................................... System Monitoring Tool
+
+    # CLI Tools ----------------------------------------------------------------------------------------------------
+    fastfetch # ......................................................................... Display system information
+    watch # ......................................................................... Execute a program periodically
+    vim # .............................................................................................. Text editor
+    git # .......................................................................................... Version control
+    lazygit # .................................................................................. Terminal UI for git
+    gitmoji-cli # ................................................................................ Emoji CLI for git
+    github-cli # ........................................................................................ GitHub CLI
+    commitizen # ........................................................................... CLI for commit messages
+    mkalias # ....................................................................................... Create aliases
+    bat # .................................................................................... Replacement for `cat`
+    lsd # ..................................................................................... Replacement for `ls`
+    # eza # ................................................................................... Replacement for `ls`
+    zoxide # .................................................................................. Replacement for `cd`
+    fzf # ............................................................................................. Fuzzy finder
+    pay-respects # ................................................. Correct previous console command like "thefuck"
+    jless # ............................................................................................ JSON viewer
+    ripgrep # .............................................................................. Search files with regex
+    imagemagick # .......................................................................... Image manipulation tool
+    gzip # ................................................................................... File compression tool
+    mas # ..................................................................... Mac App Store command line interface
+    scc # ........................................................................... Sloc, code and comment counter
+    secretspec # ............................................................................... Declarative secrets
+
+    # Development Tools --------------------------------------------------------------------------------------------
+    xcodes # ....................................................................... CLI to install and switch Xcode
+    fnm # ............................................................................. fast Node.js version manager
+    yarn # ................................................................................. Node.js package manager
+    pyenv # ................................................................................. Python version manager
+    fastlane # .................................................................... Mobile app build automation tool
+    openjdk17 # ............................................................................... Java Development Kit
+    postman # ...................................................................................... API development
+    gitleaks # .......................................................................................... GitHub CLI
+    act # ....................................................................................... GitHub Actions CLI
+    stripe-cli # ........................................................................................ Stripe CLI
+    terraform # ..................................................................... Infrastructure management tool
+    awscli2 # .............................................................................................. AWS CLI
+    openspec # ............................................................................. Spec-driven development
+    uv # .................................................................................. Python package installer
+    container # .................................................................... macOS native Container Platform
+    docker # .................................................................................... Container Platform
+    docker-compose # .................................................................... Container Composition Tool
+    docker-credential-helpers # ..................................................... Credentials Helpers for Docker
+    colima # .............................................................................. Docker Context & Runtime
+
+    # Networking --------------------------------------------------------------------------------------------------
+    socat # ....................................................................... Bidirectional data transfer tool
+
+    # AI Tools -----------------------------------------------------------------------------------------------------
+    # claude-code # ....................................................................................... Claude CLI
+    # rtk 0.43.0 tests fail to compile on current rustc (-D warnings + stricter
+    # dead-code lint); binary builds fine. Drop the override once upstream ships a fix.
+    (rtk.overrideAttrs (_: {
+      doCheck = false;
+    })) # ................................................. LLM CLI proxy
+    context7-mcp # .......................................................................... Code Documentation MCP
+    agent-browser # .................................................. Headless browser automation CLI for AI agents
+    gemini-cli # ........................................................................................ Gemini CLI
+
+    # Editors & IDEs -----------------------------------------------------------------------------------------------
+    vscode # .................................................................................... Visual Studio Code
+    beekeeper-studio # .................................................................... Database management tool
+
+    # Tools
+    # acli # ......................................................................................... Atlassian CLI
+    jira-cli-go # ......................................................................................... Jira CLI
+
+    # Languages ----------------------------------------------------------------------------------------------------
+    ruby_3_4 # ........................................................................... Ruby programming language
+
+    # Apps ---------------------------------------------------------------------------------------------------------
+    # _1password-gui # ............................................................................ Password manager
+    # rectangle-pro # .................................................................. Window management for macOS
+    obsidian # ................................................................ Note-taking and knowledge management
+    appcleaner # ......................................................................... App uninstaller for macOS
+
+  ];
+
+  # LAUNCHD ==========================================================================================================
+  # `container system start` writes its plist into the app root
+  # (~/Library/Application Support/com.apple.container/apiserver/apiserver.plist) and launchctl-bootstraps it from
+  # there. launchd only auto-loads agents from ~/Library/LaunchAgents at login, so that registration is session-scoped
+  # and dies on every reboot ("apiserver is not running and not registered with launchd").
+  # Declare the agent here instead: nix-darwin copies it to ~/Library/LaunchAgents and `launchctl load -w`s it on
+  # activation, and the store path is re-interpolated on every rebuild, so a container bump plus `nix.gc` can't leave
+  # a dangling ProgramArguments path. Keys mirror upstream SystemStart.swift exactly — note Label must be set
+  # explicitly, since nix-darwin would otherwise prefix it (org.nixos.*) and break the MachServices lookup.
+  launchd.user.agents.container-apiserver.serviceConfig = {
+    Label = "com.apple.container.apiserver";
+    ProgramArguments = [
+      "${pkgs.container}/bin/container-apiserver"
+      "start"
+    ];
+    EnvironmentVariables = {
+      CONTAINER_INSTALL_ROOT = "${pkgs.container}";
+      CONTAINER_APP_ROOT = "/Users/${config.system.primaryUser}/Library/Application Support/com.apple.container";
     };
+    MachServices."com.apple.container.apiserver" = true;
+    # Background/System alongside Aqua so the service also loads for headless/SSH sessions.
+    LimitLoadToSessionType = [
+      "Aqua"
+      "Background"
+      "System"
+    ];
+    RunAtLoad = true;
+  };
 
-    # HOMEBREW =========================================================================================================
-    # brew cleanup
-    homebrew = {
-      enable = true;
-      onActivation = {
-        # Homebrew dropped the `--force-cleanup` flag that nix-darwin emits for
-        # `cleanup = "zap"`, so activation fails with `invalid option: --force-cleanup`.
-        # Drive the cleanup ourselves via extraFlags instead: `--cleanup` performs a
-        # forced cleanup and `--zap` makes it zap casks — same effect as `cleanup = "zap"`.
-        cleanup = "none"; # was "zap"; see extraFlags below
-        autoUpdate = true;
-        upgrade = true;
-        extraFlags = [ "--cleanup" "--zap" ];
-      };
-      brews = [
-        "coreutils" # ....................................................................................... Core Utils
-        "fvm" # ................................................................................ Flutter version manager
-        "cocoapods" # ............................................................................... Dependency manager
-        "vercel-cli" # ........................................................................ Vercel command-line tool
-        "tpm" # .................................................................................... Tmux plugin manager
-        "actionlint" # ..................................................... Static checker for GitHub Actions workflows
-        "checkov" # ......................................................... Static analysis for Infrastructure-as-Code
-        "docker-credential-helper-ecr" # ............................................. Docker Credentials Helper For ECR
+  # HOMEBREW =========================================================================================================
+  # brew cleanup
+  homebrew = {
+    enable = true;
+    onActivation = {
+      # Homebrew dropped the `--force-cleanup` flag that nix-darwin emits for
+      # `cleanup = "zap"`, so activation fails with `invalid option: --force-cleanup`.
+      # Drive the cleanup ourselves via extraFlags instead: `--cleanup` performs a
+      # forced cleanup and `--zap` makes it zap casks — same effect as `cleanup = "zap"`.
+      cleanup = "none"; # was "zap"; see extraFlags below
+      autoUpdate = true;
+      upgrade = true;
+      extraFlags = [
+        "--cleanup"
+        "--zap"
       ];
-      casks = [
-        "1password-cli" # ................................................................................ 1Password CLI
-        "kitty" # .................................................................................... Terminal emulator
-        "ssh-config-editor" # ................................................................. SSH configuration editor
-        "imageoptim" # ......................................................................... Image optimization tool
-        "istat-menus" # ......................................................................... System monitoring tool
-        "intellij-idea-ce" # .......................................................... Java IDE for Android development
-        "android-studio" # ............................................................. Android development environment
-        "bambu-studio" # ......................................................... 3D printing slicer for Bambu printers
-        "rectangle-pro" # .................................................................. Window management for macOS
-        "shottr" # ..................................................................................... Screenshot tool
-        "linearmouse" # ................................................. Disable mouse scroll acceleration (notched wheel)
-        "sublime-text" # ................................................................................... Text Editor
-        "chatgpt" # ..................................................................................... ChatGPT Client
-        "ankerwork" # ......................................................................... AnkerWork Device Manager
-        "corelocationcli" # ........................................................................... GPS Location CLI
-        "openvpn-connect" # ............................................................................. OpenVPN Client
-        "tailscale-app" # ......................................................................... Tailscale VPN Client
-        "slack" # ................................................................................... Team collaboration
-      ];
-      masApps = {
-        "Amphetamin" = 937984704; # .................................................................... Keep Mac awake
-        "The Unarchiver" = 425424353; # ............................................................... Unarchiving tool
-        # "Velja" = 1607635845; # .............................................................. Browser routing for macOS
-        # "Pure Paste" = 1611378436; # ........................................................ Paste without formatting
-        # "Shareful" = 1522267256; # ...................................................... Share files and links easily
-        "Hidden Bar" = 1452453066; # ................................................................ Hide menubar items
-        #"Hand Mirror" = 1502839586; # .............................................................. Mirror menubar app
-        # "WhatsApp Messenger" = 310633997; # ................................................................ Messenger
-      };
     };
+    brews = [
+      "coreutils" # ....................................................................................... Core Utils
+      "fvm" # ................................................................................ Flutter version manager
+      "cocoapods" # ............................................................................... Dependency manager
+      "vercel-cli" # ........................................................................ Vercel command-line tool
+      "tpm" # .................................................................................... Tmux plugin manager
+      "actionlint" # ..................................................... Static checker for GitHub Actions workflows
+      "checkov" # ......................................................... Static analysis for Infrastructure-as-Code
+      "docker-credential-helper-ecr" # ............................................. Docker Credentials Helper For ECR
+    ];
+    casks = [
+      "1password-cli" # ................................................................................ 1Password CLI
+      "kitty" # .................................................................................... Terminal emulator
+      "ssh-config-editor" # ................................................................. SSH configuration editor
+      "imageoptim" # ......................................................................... Image optimization tool
+      "istat-menus" # ......................................................................... System monitoring tool
+      "intellij-idea-ce" # .......................................................... Java IDE for Android development
+      "android-studio" # ............................................................. Android development environment
+      "bambu-studio" # ......................................................... 3D printing slicer for Bambu printers
+      "rectangle-pro" # .................................................................. Window management for macOS
+      "shottr" # ..................................................................................... Screenshot tool
+      "linearmouse" # ................................................. Disable mouse scroll acceleration (notched wheel)
+      "sublime-text" # ................................................................................... Text Editor
+      "chatgpt" # ..................................................................................... ChatGPT Client
+      "ankerwork" # ......................................................................... AnkerWork Device Manager
+      "corelocationcli" # ........................................................................... GPS Location CLI
+      "openvpn-connect" # ............................................................................. OpenVPN Client
+      "tailscale-app" # ......................................................................... Tailscale VPN Client
+      "slack" # ................................................................................... Team collaboration
+    ];
+    masApps = {
+      "Amphetamin" = 937984704; # .................................................................... Keep Mac awake
+      "The Unarchiver" = 425424353; # ............................................................... Unarchiving tool
+      # "Velja" = 1607635845; # .............................................................. Browser routing for macOS
+      # "Pure Paste" = 1611378436; # ........................................................ Paste without formatting
+      # "Shareful" = 1522267256; # ...................................................... Share files and links easily
+      "Hidden Bar" = 1452453066; # ................................................................ Hide menubar items
+      #"Hand Mirror" = 1502839586; # .............................................................. Mirror menubar app
+      # "WhatsApp Messenger" = 310633997; # ................................................................ Messenger
+    };
+  };
 
-    # ALIASES ==========================================================================================================
-    environment.shellAliases = {
-        nix-count-garbage = "nix-store --gc --print-dead | wc -l";
-        nix-rebuild = "sudo darwin-rebuild switch --flake \"$(readlink -f ~/.config/nix)#shared\"";
-        sync-dotfiles = "git -C /etc/dotfiles pull";
-        cat = "bat";
-        # nvim is configured declaratively via nixvim (collection/nix/nvim). pkgs.vim stays in
-        # systemPackages as an escape hatch — reach it as `\vim` if this config ever breaks.
-        vim = "nvim";
-        v = "nvim";
-        ls = "lsd";
-        ll = "lsd -l";
-        la = "lsd -a";
-        lla = "lsd -la";
-        l = "lsd -la";
-        gs = "git status";
-        gd = "git diff";
-        grep = "rg";
-        nvm = "fnm";
-        lg = "lazygit";
-        config_link="sh /etc/dotfiles/link.sh";
-        config_pull="sh /etc/dotfiles/pull.sh";
-        flutter="fvm flutter";
-        gcd="git checkout develop";
-        gfd="git fetch upstream develop:develop";
-        cl="headroom wrap claude --code-memory none --memory";
-        tpm-install="/opt/homebrew/opt/tpm/share/tpm/bin/install_plugins";
-        tpm-update="/opt/homebrew/opt/tpm/share/tpm/bin/update_plugins";
-        tpm-clean="/opt/homebrew/opt/tpm/share/tpm/bin/clean_plugins";
-        ts="tmux new-session -A -s";
-        tk="tmux kill-session -t";
-        tl="tmux list-sessions";
-        no-sleep="caffeinate -is";
-        remote-restart="sudo fdesetup authrestart -delayminutes 1";
-        edit-dotfiles="code /etc/dotfiles/";
-        empty-trash="rm -rf ~/.Trash/*";
-        cm="container machine";
-        docker-up="colima start --vm-type vz && docker context use colima";
-    };
+  # ALIASES ==========================================================================================================
+  environment.shellAliases = {
+    nix-count-garbage = "nix-store --gc --print-dead | wc -l";
+    nix-rebuild = "sudo darwin-rebuild switch --flake \"$(readlink -f ~/.config/nix)#shared\"";
+    sync-dotfiles = "git -C /etc/dotfiles pull";
+    cat = "bat";
+    # nvim is configured declaratively via nixvim (collection/nix/nvim). pkgs.vim stays in
+    # systemPackages as an escape hatch — reach it as `\vim` if this config ever breaks.
+    vim = "nvim";
+    v = "nvim";
+    ls = "lsd";
+    ll = "lsd -l";
+    la = "lsd -a";
+    lla = "lsd -la";
+    l = "lsd -la";
+    gs = "git status";
+    gd = "git diff";
+    grep = "rg";
+    nvm = "fnm";
+    lg = "lazygit";
+    config_link = "sh /etc/dotfiles/link.sh";
+    config_pull = "sh /etc/dotfiles/pull.sh";
+    flutter = "fvm flutter";
+    gcd = "git checkout develop";
+    gfd = "git fetch upstream develop:develop";
+    cl = "headroom wrap claude --code-memory none --memory";
+    tpm-install = "/opt/homebrew/opt/tpm/share/tpm/bin/install_plugins";
+    tpm-update = "/opt/homebrew/opt/tpm/share/tpm/bin/update_plugins";
+    tpm-clean = "/opt/homebrew/opt/tpm/share/tpm/bin/clean_plugins";
+    ts = "tmux new-session -A -s";
+    tk = "tmux kill-session -t";
+    tl = "tmux list-sessions";
+    no-sleep = "caffeinate -is";
+    remote-restart = "sudo fdesetup authrestart -delayminutes 1";
+    edit-dotfiles = "code /etc/dotfiles/";
+    empty-trash = "rm -rf ~/.Trash/*";
+    cm = "container machine";
+    docker-up = "colima start --vm-type vz && docker context use colima";
+  };
 }
